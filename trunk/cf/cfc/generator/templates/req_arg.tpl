@@ -1,1 +1,0 @@
-<cfargument name="%1%" type="%2%" required="true">
