@@ -1,0 +1,1 @@
+<cfset local.%1% = arguments.%1%>
