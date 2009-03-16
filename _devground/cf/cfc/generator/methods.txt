@@ -1,0 +1,52 @@
+KNOWN_DELIMITERS string false 10,32,44,124,43,64
+name string
+extends string false
+declvars struct false ArrayNew(1)
+methods struct false ArrayNew(1)
+templates struct false StructNew()
+knownvars struct false StructNew()
+public_gsv string false
+private_gsv string false
+other_methods string false
+create_init boolean false true
+auto_set_init boolean false true
+init_argv string false 
+
+methods array false ArrayNew(1)
+method  struct false StructNew()
+retvar  struct false StructNew()
+rettype struct false StructNew()
+params array false ArrayNew(1)
+param struct false StructNew()
+varstruct struct false StructNew()
+vararray array false ArrayNew(1)
+varstring string false 
+body array  false ArrayNew(1)
+component struct false StructNew()
+componentbody string false
+template string false
+
+@parseDelimitedString instring,delimiter= instring array local.result
+@guessDelimiter instring,delimiter instring string local.delimiter
+@parseMethod instring instring struct local.result
+@parseParams instring instring array local.result
+@parseParam instring instring struct local.result
+@createVar instring instring struct local.result
+@addScopeVar varstruct,scopename varstruct,scopename
+@getScopeVar varname,scopename varname,scopename struct local.result
+@parseTemplate template,replacement template,replacement string local.result
+@addMethod instring instring array local.methods
+@addParam instring instring array local.params
+@createGetterSetter varstruct varstruct array local.gettersetter
+@createInit varstruct varstruct array local.gettersetter
+@createSetVariable varstruct varstruct array local.gettersetter
+@createMethod instring instring struct local.result
+@createParam instring instring struct local.result
+@guessVariable name,scope name struct local.variable
+@determineDefault  instring '' string local.instring
+@determineRequired instring '' string local.instring
+@determineDatatype instring '' string local.instring
+
+
+name,public_gsv,private_gsv,other_methods,create_init,auto_set_init,init_argv
+name
