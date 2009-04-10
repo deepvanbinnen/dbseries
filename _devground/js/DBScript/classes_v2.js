@@ -18,15 +18,15 @@ ClassHandler.prototype = {
 	onWinLoad : function(){
 		var getElementsByClassName;
 		if(!getElementsByClassName)
-			getElementsByClassName = $C;
+			getElementsByClassName = DBScript.$C;
 	}
 	
 	,
 	addClass : function (elmArray, className) {
-	   	var elmArray = $$(elmArray);
+	   	var elmArray = DBScript.$$(elmArray);
 	   	var element, i;
 	   	for(i=0;i<elmArray.length,element=elmArray[i];i++){
-	   		if (!hasClass(element, className)) {
+	   		if (!this.hasClass(element, className)) {
 		      if (element.className) element.className += " " + className;
 		      else element.className = className;
 		   }
@@ -36,7 +36,7 @@ ClassHandler.prototype = {
 	,
 	removeClass : function(elmArray, className) {
 		var regexp = new RegExp("(^|\\s)" + className + "(\\s|$)");
-		var elmArray = $$(elmArray);
+		var elmArray = DBScript.$$(elmArray);
 	   	var element, i;
 	   	for(i=0;i<elmArray.length,element=elmArray[i];i++){
 	   		element.className = element.className.replace(regexp,"$2");
@@ -46,14 +46,14 @@ ClassHandler.prototype = {
 	,
 	hasClass : function(element, className) {
 	    var regexp = new RegExp("(^|\\s)" + className + "(\\s|$)");
-		var element = $(element);
+		var element = DBScript.$(element);
 	    return regexp.test(element.className);
 	}
 
 	,
 	swapClass : function(elmArray, oldClassName, newClassName) {
-	    removeClass(elmArray, oldClassName);
-		addClass(elmArray, newClassName);
+		this.removeClass(elmArray, oldClassName);
+		this.addClass(elmArray, newClassName);
 	}
 	
 	,

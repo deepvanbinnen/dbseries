@@ -2,6 +2,7 @@ var DBScriptHandler;
 if(!DBScriptHandler){
 	DBScriptHandler = function(debug){
 		this.debug = debug || false;
+		this.name = "DBScript";
 		this.init();
 		return this;
 	};
@@ -151,7 +152,7 @@ if(!DBScriptHandler){
 				}
 				
 				if(defineAsGlobal)
-					this.makeFunctionsGlobal(classDef);
+					this.addFunctionsToContext(classDef, this);
 				// DBScript.echo("registering: "+objname+" @ "+filename);
 			}
 			return this.getDependancy(objname);
@@ -164,12 +165,14 @@ if(!DBScriptHandler){
 		}
 		
 		,
-		makeFunctionsGlobal : function(classDef){
+		addFunctionsToContext : function(classDef, context){
+			var context = context || window;
+			//alert(context);
 			for(func in classDef){
 				if(classDef[func] && classDef[func].constructor==Function){
-					if(func!="onWinLoad" && !window[func]) {
-						this.echo("Adding: "+func+" from "+classDef.toString());
-						window[func] = classDef[func];
+					if(func!="onWinLoad" && !context[func]) {
+						this.echo("Adding: "+func+" from "+ classDef.toString());
+						context[func] = classDef[func];
 					}
 				}
 			}
@@ -188,12 +191,14 @@ if(!DBScriptHandler){
 	}
 	
 	var DBScript = new DBScriptHandler(true);
+	DBScript.include("DBScript/array_v2.js");
+	DBScript.include("DBScript/string.js");
 	DBScript.include("DBScript/dollar_v2.js");
 	DBScript.include("DBScript/events_v2.js");
 	DBScript.include("DBScript/classes_v2.js");
 	DBScript.include("DBScript/DOMHelper_v2.js");
-	DBScript.include("DBScript/string.js");
 	DBScript.include("DBScript/tables.js");
 	DBScript.include("DBScript/xhr_v2.js");
+	DBScript.include("DBScript/popupwin.js");
 }
 

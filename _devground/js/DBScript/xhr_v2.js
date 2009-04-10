@@ -18,8 +18,8 @@ if(!XHRClass){
 		
 		onWinLoad : function(){
 			// any call which should execute after the DOM has been loaded goes here
-			addEvent(DBScript.Classes.$C("xhr", "FORM"),"submit", DBScript.XHRClass.postXHRRequest);
-			addEvent(DBScript.Classes.$C("xhr","A"),"click", DBScript.XHRClass.doXHRRequest);
+			DBScript.addEvent(DBScript.$C("xhr", "FORM"),"submit", DBScript.postXHRRequest);
+			DBScript.addEvent(DBScript.$C("xhr","A"),"click", DBScript.doXHRRequest);
 		},
 		
 		sendAjaxRequest : function(usePost){

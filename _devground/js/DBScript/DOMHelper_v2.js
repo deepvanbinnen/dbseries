@@ -109,7 +109,9 @@ if(!DOMHelper){
 	}
 }
 
-/*function init(){
+/*
+
+function init(){
 	if(DBScript){
 		var DBS = DBScript.instanceOf;
 		console.debug(DBS.$("content"));

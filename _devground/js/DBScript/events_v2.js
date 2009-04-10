@@ -14,7 +14,7 @@ if(!EventHandler){
 		}, 
 		
 		addEvent : function(elmArray,evt,fn){
-			var elmArray = $$(elmArray);
+			var elmArray = DBScript.$$(elmArray);
 			var evtAdded = false;
 			for(var i=0;i<elmArray.length;i++){
 				evtAdded = false;
@@ -37,7 +37,7 @@ if(!EventHandler){
 		},
 		
 		removeEvent : function(elmArray,evt,fn){
-			var elmArray = $$(elmArray);
+			var elmArray = DBScript.$$(elmArray);
 			for(var i=0;i<elmArray.length;i++){
 				if(elmArray[i].removeEventListener){
 					elmArray[i].removeEventListener(evt,fn,false);
@@ -77,17 +77,17 @@ if(!EventHandler){
 		},
 		
 		$G : function(el){
-			var el = $(el);
+			var el = DBScript.$(el);
 			if(el.hasAttribute("value")) return el.value;
 			else return el.innerHTML;
 		},
 	
 		$S : function(el, val){
 			var el = $(el);
-			if(typeof val != "string") val = $G(val);
+			if(typeof val != "string") val = DBScript.$G(val);
 			if(el.hasAttribute("value")) el.value = val;
 			else el.innerHTML = val;
-			return $G(el);
+			return DBScript.$G(el);
 		},
 		
 		getElementEvents : function(el){

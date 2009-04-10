@@ -52,7 +52,7 @@ if(!Dollar){
 						nElmArray.push($(el));
 					}
 				} else {
-					nElmArray.push($(elmArray));
+					nElmArray.push(DBScript.$(elmArray));
 				}
 				elmArray = nElmArray;
 			}

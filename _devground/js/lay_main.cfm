@@ -1,5 +1,6 @@
 <cfparam name="attributes.javascripts" default="#ArrayNew(1)#">
 <cfset ArrayAppend(attributes.javascripts,"DBScript/DBScript.js")>
+<cfset ArrayAppend(attributes.javascripts,"eNS/ens.js")>
 <cfoutput>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -26,47 +27,7 @@
 <!--- <link type="text/css" rel="stylesheet" href="media/css/global.css" /> --->
 <cfloop array="#attributes.javascripts#" index="jsfile"><script src="#jsfile#" type="text/javascript"></script></cfloop>
 <script type="text/javascript">
-	
-var PopupWindow = function(){
-	this.version = "1.0";
-	this.name    = "PopupWindow";
-	this.src     = "";
-	this.gscope  = false; // if true appends class functions to global scope so that they can be called directly
-};
 
-PopupWindow.prototype = {
-	windows : null,
-	
-	toString : function(){
-			return this.name;
-	},
-	
-	onWinLoad : function(){
-		// any call which should execute after the DOM has been loaded goes here
-		DBScript.Events.addEvent(DBScript.Classes.$C("inline-popup-link", "A"), "click", DBScript.PopupWindow.show);
-		DBScript.Events.addEvent(DBScript.Classes.$C("inline-popup-close", "A"), "click", DBScript.PopupWindow.hide);
-		
-	},
-		
-	show : function(e){
-		var trg = DBScript.Events.getTargetElement(e);
-		var popupDiv = DBScript.PopupWindow.elementFromHref(trg.href);
-		if(popupDiv) DBScript.Classes.swapClass(popupDiv, "hidden", "visible");
-	}
-	
-	, hide : function(e){
-		var trg = DBScript.Events.getTargetElement(e);
-		var popupDiv = DBScript.PopupWindow.elementFromHref(trg.href);
-		if(popupDiv) DBScript.Classes.swapClass(popupDiv, "visible", "hidden");
-	}
-	
-	, elementFromHref : function(href) {
-		var element_id = href.split("##");
-		element_id.shift();
-		return DBScript.Dollar.$(element_id.join());
-	}
-};
-DBScript.register(PopupWindow);
 
 var Validator = function(){
 	this.version = "1.0";
@@ -183,23 +144,25 @@ FormValidator.prototype = {
 	}
 	
 	, setValidatorsFromClass : function(validator, element){
-		var classes = element.className.split(" ");
-		for(var c=0;c<classes.length;c++){
-			switch(classes[c]){
-				case "required":
-					validator.setValidator("required", DataValidators["required"]);
-					break;
-				case "email":
-					validator.setValidator("required", DataValidators["required"]);
-					break;	
-					
+		if(element) {
+			var classes = element.className.split(" ");
+			for(var c=0;c<classes.length;c++){
+				switch(classes[c]){
+					case "required":
+						validator.setValidator("required", DataValidators["required"]);
+						break;
+					case "email":
+						validator.setValidator("email", DataValidators["email"]);
+						break;	
+						
+				}
 			}
 		}
 		return validator;
 	}
 }
 
-
+console.debug(ENS);
 </script>
 </head><body>
 
