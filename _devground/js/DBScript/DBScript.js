@@ -4,6 +4,8 @@ if(!DBScriptHandler){
 		this.debug = debug || false;
 		this.name = "DBScript";
 		this.init();
+		
+		this.emptyFunction = function(){};
 		return this;
 	};
 	
@@ -14,27 +16,33 @@ if(!DBScriptHandler){
 			this.echo("init DBScript...");
 			this.onLoad(this.unload, true)
 			this.dependancies = {};
-			this.Dependancy = function(objame, filename){
-				this.init(objame, filename);
+			this.Dependancy = function(objame, filename, constructor){
+				this.init(objame, filename, constructor);
 				return this;
 			};
 			this.Dependancy.prototype = {
-				init : function(objame, filename){
+				init : function(objame, filename, constructor){
 					this.name     = objame;
 					this.filename = filename;
 					this.ldstatus = 0; // 0=uninited;1=start;2=loaded;
+					this.instance = constructor;
 					// console.debug(myDBScript);
 				}
-				,
-				setStatus : function(ldstatus){
+				, setStatus : function(ldstatus){
 					this.ldstatus = ldstatus; // 0=uninited;1=start;2=loaded;
 				}
 			}
 		}
 	
 		,
-		echo : function(message){
-			if (this.debug)
+		createInstance : function(className) {
+			return (this.dependancies[className]) ? new this.dependancies[className].instance() : new this.emptyFunction();
+		}
+	
+		,
+		echo : function(message, force){
+			var force = force || false;
+			if (this.debug || force)
 				console.debug(message);
 		}
 		
@@ -141,27 +149,34 @@ if(!DBScriptHandler){
 		}
 		
 		,
-		doRegister : function(objname, filename, classDef, defineAsGlobal){
+		doRegister : function(objname, filename, classInstance, classDef, extendDBScript){
 			var defineAsGlobal = defineAsGlobal || false;
 			if(!this.getDependancy(objname)){
-				this.echo("Registering: "+objname+" @ "+filename+" through class: "+classDef.toString());
-				this.dependancies[objname] = new this.Dependancy(objname, filename);
-				DBScriptHandler.prototype[objname] = classDef;
-				if(classDef["onWinLoad"]){
-					this.onLoad(classDef["onWinLoad"]);
-				}
 				
-				if(defineAsGlobal)
-					this.addFunctionsToContext(classDef, this);
-				// DBScript.echo("registering: "+objname+" @ "+filename);
+				this.dependancies[objname] = new this.Dependancy(objname, filename, classDef);
+				DBScriptHandler.prototype[objname] = classInstance;
+				if(classInstance) {
+					this.echo("Registering: "+objname+" @ "+filename+" through class: "+classInstance.toString());
+					if(classInstance["onWinLoad"]){
+						this.onLoad(classInstance["onWinLoad"]);
+					}
+					if(extendDBScript)
+						this.addFunctionsToContext(classInstance, this);
+					// DBScript.echo("registering: "+objname+" @ "+filename);
+				}
 			}
 			return this.getDependancy(objname);
 		}
 		
 		,
-		register : function(ClassFunc){
-			var myClass = new ClassFunc();
-			this.doRegister(myClass.name, myClass.src, myClass, myClass.gscope);
+		register : function(ClassFunc, instantiate, name){
+			var instantiate = (arguments.length > 1) ? instantiate : true;
+			var myClass = instantiate ? new ClassFunc() : null;
+			var name    = (arguments.length > 2) ? name : (myClass) ? myClass.name : "__unknown__" + this.scrindex;
+			var src     = (myClass && myClass.src) ? myClass.src : "";
+			var gscope  = (myClass && myClass.gscope) ? true : false;
+			// this.echo(ClassFunc.toString(), true);
+			this.doRegister(name, src, myClass, ClassFunc, gscope);
 		}
 		
 		,
@@ -180,6 +195,13 @@ if(!DBScriptHandler){
 		}
 		
 		,
+		copyProps : function(source, destination, keymap){
+			for(var key in keymap){
+				destination[keymap[key]] = source[key];
+			}
+		}
+		
+		,
 		isRegistered : function(objname) {
 			return this.getDependancy(objname);
 		}
@@ -190,15 +212,18 @@ if(!DBScriptHandler){
 		}
 	}
 	
-	var DBScript = new DBScriptHandler(true);
+	var DBScript = new DBScriptHandler(false);
 	DBScript.include("DBScript/array_v2.js");
 	DBScript.include("DBScript/string.js");
 	DBScript.include("DBScript/dollar_v2.js");
 	DBScript.include("DBScript/events_v2.js");
+	DBScript.include("DBScript/keyboard.js");
 	DBScript.include("DBScript/classes_v2.js");
 	DBScript.include("DBScript/DOMHelper_v2.js");
 	DBScript.include("DBScript/tables.js");
 	DBScript.include("DBScript/xhr_v2.js");
 	DBScript.include("DBScript/popupwin.js");
+	DBScript.include("DBScript/aliases.js");
+	DBScript.include("DBScript/formelement.js");
 }
 

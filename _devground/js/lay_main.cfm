@@ -26,22 +26,14 @@
 </style>
 <!--- <link type="text/css" rel="stylesheet" href="media/css/global.css" /> --->
 <cfloop array="#attributes.javascripts#" index="jsfile"><script src="#jsfile#" type="text/javascript"></script></cfloop>
-<script type="text/javascript">
-
-
-var Validator = function(){
+<!--- <script type="text/javascript">
+DBScript.register(function() {
 	this.version = "1.0";
 	this.name    = "Validator";
 	this.src     = "";
 	this.gscope  = false; // if true appends class functions to global scope so that they can be called directly
-}
+});
 
-/*
-Validator.prototype = {
-	  formcollect : new Array()
-	, elmcollect  : new Array()
-	, validators  : new Array()
-}*/
 
 var OctopusValidators = {
 	"titel_voor"          : new RegExp("^[a-zA-Z\. ]*$"),
@@ -74,12 +66,16 @@ var DataValidators = {
 	
 
 
-var FormValidator = function(){
+DBScript.register(function() {
 	var _this = this;
 	this.version = "1.0";
 	this.name    = "FormValidator";
 	this.src     = "";
 	this.gscope  = false; // if true appends class functions to global scope so that they can be called directly
+	
+	this.form = "";
+	this.elements = new Array();
+	this.validator_stacks = new Object();
 	
 	var ElementValidator = function(element){ 
 		var _this = this;
@@ -98,72 +94,76 @@ var FormValidator = function(){
 			var value = _this.element.value || "";
 			return value;
 		}
-	}
+	};
 	
 	_this.newValidator = function(element){
 		return new ElementValidator(element);
 	}
-};
-
-FormValidator.prototype = {
-	  form : ""
-	, elements : new Array()
-	, validator_stacks: new Object()
 	
-	, setElements : function(){
-		for(var i=0;i<this.form.elements.length;i++){
-			if(this.inspectable(this.form.elements[i])){
-				this.elements.push(this.getElementId(this.form.elements[i]));
-				this.validator_stacks[this.elements[this.elements.length-1]] = this.newValidator(this.form.elements[i]); // stuff in validator functions later
-				this.setValidatorsFromClass(this.validator_stacks[this.elements[this.elements.length-1]], this.form.elements[i]);
-			}
-		}
-	}
-	
-	, getElementId : function(element){
-		var id = element.id || "";
-		if(id=="") id = "__FORMVALIDATOR__" + this.elements.length;
-		return id;
-	}
-	
-	, inspectable : function(element){
-		return (DBScript.Dollar.$(element) && (["input","select,textarea,button"].indexOf(DBScript.Dollar.$(element).tagName.toLowerCase())!=-1)) ? true : false;
-	}
-
-	, getElements : function(){
-		return this.elements;
-	}
-	
-    , getElementsStack : function(){
-		return this.validator_stacks;
-	}
-	
-	, init : function(id){
-		this.form = DBScript.Dollar.$(id);
-		this.setElements();
-	}
-	
-	, setValidatorsFromClass : function(validator, element){
-		if(element) {
-			var classes = element.className.split(" ");
-			for(var c=0;c<classes.length;c++){
-				switch(classes[c]){
-					case "required":
-						validator.setValidator("required", DataValidators["required"]);
-						break;
-					case "email":
-						validator.setValidator("email", DataValidators["email"]);
-						break;	
-						
+	DBScript.addFunctionsToContext( {
+	    setElements : function(){
+			for(var i=0;i<this.form.elements.length;i++){
+				if(this.inspectable(this.form.elements[i])){
+					this.elements.push(this.getElementId(this.form.elements[i]));
+					this.validator_stacks[this.elements[this.elements.length-1]] = this.newValidator(this.form.elements[i]); // stuff in validator functions later
+					this.setValidatorsFromClass(this.validator_stacks[this.elements[this.elements.length-1]], this.form.elements[i]);
 				}
 			}
 		}
-		return validator;
-	}
+		
+		, getElementId : function(element){
+			var id = element.id || "";
+			if(id=="") id = "__FORMVALIDATOR__" + this.elements.length;
+			return id;
+		}
+		
+		, inspectable : function(element){
+			return (DBScript.Dollar.$(element) && (["input","select,textarea,button"].indexOf(DBScript.Dollar.$(element).tagName.toLowerCase())!=-1)) ? true : false;
+		}
+	
+		, getElements : function(){
+			return this.elements;
+		}
+		
+	    , getElementsStack : function(){
+			return this.validator_stacks;
+		}
+		
+		, init : function(id){
+			this.form = DBScript.Dollar.$(id);
+			this.setElements();
+		}
+		
+		, setValidatorsFromClass : function(validator, element){
+			if(element) {
+				var classes = element.className.split(" ");
+				for(var c=0;c<classes.length;c++){
+					switch(classes[c]){
+						case "required":
+							validator.setValidator("required", DataValidators["required"]);
+							break;
+						case "email":
+							validator.setValidator("email", DataValidators["email"]);
+							break;	
+							
+					}
+				}
+			}
+			return validator;
+		}
+	}, this.constructor.prototype);
+});
+
+function keyPress_cb(e){
+	console.debug( DBScript.Events.getCharCode(e) );
 }
 
-console.debug(ENS);
-</script>
+
+
+
+
+
+</script> --->
 </head><body>
 
 <div id="canvas">
@@ -234,17 +234,11 @@ console.debug(ENS);
 </div>
 
 <script type="text/javascript">
-var fv = new FormValidator();
-fv.init("myform");
-
-console.debug(fv.getElements());
-console.debug(fv.getElementsStack());
-
-var x= fv.newValidator("email-input");
-
-fv.setValidatorsFromClass("email-input");
-
-console.debug(x);
+var s = DBScript.createInstance("FormElement");
+var s2 = DBScript.createInstance("FormElement");
+s.init("email-input");
+s2.init("date-input");
+console.debug(s);
 
 /*
 DBScript.ElementValidator.init("email-input");

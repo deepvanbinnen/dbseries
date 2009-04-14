@@ -1,21 +1,10 @@
-/* DOC CHANGELOG AND REVISIONS */
-/* CHANGE 1.1 -- function getInnerText(elm) toegevoegd om de innerText van een element op te halen */
-/* CHANGE 1.2 -- function getInnerText(elm) aangepast om de innerText van een element op te halen */
-/* CHANGE 1.3 -- JS versies van ColdFusion's URLDecode(inString) en URLEncodedFormat(inString) toegevoegd */
-/* CHANGE 1.4 -- getElementsByClassName uitgebreid zodat je vanaf een node kunt zoeken naar specifieke tags */
-/* CHANGE 1.5 -- alles wat te maken heeft met classes verwijderd en in een apart bestand classes.js gestopt */
-/* CHANGE 1.6 -- URLEncodedFormat en URLDecode verplaatst naar string.js */
-
-var DOMHelper;
-if(!DOMHelper){
-	DOMHelper = function(){
-		this.version = "2.0";
-		this.name    = "DOMHelper";
-		this.src     = "DOMHelper_v2.js";
-		this.gscope  = true;
-	}
+DBScript.register(function() {
+	this.version = "2.0";
+	this.name    = "DOMHelper";
+	this.src     = "DOMHelper_v2.js";
+	this.gscope  = true;
 	
-	DOMHelper.prototype = {
+	DBScript.addFunctionsToContext( {
 		toString : function(){
 			return this.name;
 		},
@@ -76,7 +65,7 @@ if(!DOMHelper){
 				return;
 			if(el.tagName.toLowerCase()!=tagName.toLowerCase()){
 				if(el.parentNode) 
-					el = getParentByTagName(el.parentNode,tagName);
+					el = this.getParentByTagName(el.parentNode,tagName);
 			}
 			return el;
 		},
@@ -102,44 +91,6 @@ if(!DOMHelper){
 		getInnerHTML : function(el){
 			return el.innerHTML;
 		}
-	}
-	
-	if(DBScript){
-		DBScript.register(DOMHelper);
-	}
-}
-
-/*
-
-function init(){
-	if(DBScript){
-		var DBS = DBScript.instanceOf;
-		console.debug(DBS.$("content"));
-	}
-}
-$L(init);
-
-var myFunctions = {
-	testFunction : function(){
-		alert("this is my testfunction");
-	},
-	
-	init : function(){
-		alert($("content"));
-	},
-	
-	toString : function(){
-		return "myFunctions";
-	} 
-}
-
- 
-if(DBScript){
-	if(!DBScript.instanceOf.isRegistered("myFunctions")){
-		DBScript.instanceOf.doRegister("myFunctions", "myFunctions.js", myFunctions, false);
-	}
-	DBScript.instanceOf.onLoad(myFunctions.init);
-}
-*/
-
+	}, this.constructor.prototype);
+});
 

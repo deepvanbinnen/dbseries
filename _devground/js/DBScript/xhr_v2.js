@@ -1,13 +1,12 @@
-var XHRClass;
-if(!XHRClass){
-	XHRClass = function(){
-		this.version = "2.0";
-		this.name    = "XHRClass";
-		this.src     = "xhr_v2.js";
-		this.gscope  = true; // appends class functions to global scope so that they can be called directly
-	}
- 
-	XHRClass.prototype = {
+DBScript.register(function () {
+	this.version = "2.0";
+	this.name    = "XHRClass";
+	this.src     = "xhr_v2.js";
+	this.gscope  = true; // appends class functions to global scope so that they can be called directly
+	
+	DBScript.include("DBScript/taconite-client-min.js");
+	DBScript.include("DBScript/taconite-parser-min.js");
+	DBScript.addFunctionsToContext({
 		request     : null,
 		preRequest  : null,
 		postRequest : null,
@@ -73,14 +72,8 @@ if(!XHRClass){
 			req.addFormElements(frm);
 			sendAjaxRequest(true);
 		}
-	}
-	
-	if(DBScript){
-		DBScript.include("DBScript/taconite-client-min.js");
-		DBScript.include("DBScript/taconite-parser-min.js");
-		DBScript.register(XHRClass);
-	}
-}
+	}, this.constructor.prototype);
+});
 
 
 

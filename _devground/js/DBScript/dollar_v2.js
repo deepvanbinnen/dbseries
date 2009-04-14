@@ -8,16 +8,14 @@
  * @see http://getahead.ltd.uk/dwr/browser/util/$
  */
 
-var Dollar;
-if(!Dollar){
-	Dollar = function(){
-		this.version = "2.0";
-		this.name    = "Dollar";
-		this.src     = "dollar_v2.js";
-		this.gscope  = true;
-	}
+DBScript.register(function(){
+	this.version = "2.0";
+	this.name    = "Dollar";
+	this.src     = "dollar_v2.js";
+	this.gscope  = true;
+	
  
-	Dollar.prototype = {
+	DBScript.addFunctionsToContext( {
 		toString : function(){
 			return this.name;
 		}, 
@@ -58,12 +56,8 @@ if(!Dollar){
 			}
 			return elmArray;
 		}
-	}
- 
-	if(DBScript){
-		DBScript.register(Dollar);
-	}
-};
+	}, this.constructor.prototype);
+});
 
 
  

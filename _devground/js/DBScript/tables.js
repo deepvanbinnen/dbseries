@@ -1,13 +1,10 @@
-var TableClass;
-if(!TableClass){
-	TableClass = function(){
-		this.version = "2.0";
-		this.name    = "TableClass";
-		this.src     = "tables.js";
-		this.gscope  = true; // appends class functions to global scope so that they can be called directly
-	}
- 
-	TableClass.prototype = {
+DBScript.register(function () {
+	this.version = "2.0";
+	this.name    = "TableClass";
+	this.src     = "tables.js";
+	this.gscope  = true; // appends class functions to global scope so that they can be called directly
+	
+	DBScript.addFunctionsToContext( {
 		toString : function(){
 			return this.name;
 		},
@@ -102,12 +99,8 @@ if(!TableClass){
 				}
 			}
 		}
-	}
-	
-	if(DBScript){
-		DBScript.register(TableClass);
-	}
-};
+	}, this.constructor.prototype);
+});
 
 
 
