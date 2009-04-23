@@ -1,7 +1,10 @@
 DBScript.register(function() {
+	DBScript.import("dollar");
+	
 	this.version = "2.0";
 	this.name    = "Classes";
-	this.src     = "classes_v2.js";
+	this.import  = "classes";
+	this.src     = "corelibs/classes.js";
 	this.gscope  = true;
 	
 	DBScript.addFunctionsToContext( {
@@ -65,4 +68,4 @@ DBScript.register(function() {
 			return elements;
 		}
 	}, this);
-});
+}).setStatus(2);

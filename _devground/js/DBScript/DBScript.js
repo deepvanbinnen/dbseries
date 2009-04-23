@@ -5,24 +5,84 @@ if(!DBScriptHandler){
 		this.name = "DBScript";
 		this.init();
 		
+		var id   = "DBScript";
+		var self = "";
+		var root = ""; 
+		var libmap = {};
+		var nsmap  = {};
+		
 		this.emptyFunction = function(){};
+		
+		var setSelf = function(){
+			var s = document.getElementById(id);
+			if(s){
+				self = s.src;
+				root = self.split("/");
+				root.pop();
+				root = root.join("/") + "/";
+			}
+		}
+		
+		this.getSelf = function(){
+			return root;
+		}
+		
+		this.getInclude = function(src){
+			return root + src;
+		}
+		
+		this.import = function(name){
+			var src = "";
+			if(nsmap[name] && libmap[nsmap[name]]) {
+				src = libmap[nsmap[name]];
+			} else if(libmap[name]){
+				src = libmap[name];
+			} 
+			if(src!=""){
+				this.echo("Got import includefile for:" + name + " at: " + root+src);
+				this.include(src);
+			}
+			else {
+				this.echo("Import:" + name + " not found.");
+			}
+		}
+		
+		/**
+		 * Add namespace, name and source file used by the import method   
+		 */
+		this.setLibMap = function(ns, name, src){
+			/**
+			 * @param {String} ns  namespace
+			 * @param {String} src sourcefile
+			 * @param {String} name importname
+			 */
+			 nsmap[name] = ns;
+			 libmap[ns]  = src;
+			 this.echo("added to libmap:" + name); 
+		}
+		
+		this.getLibMap = function(name){
+			return nsmap;
+		}
+		
+		setSelf();
 		return this;
 	};
 	
 	DBScriptHandler.prototype = { 
-		scrindex : 0
-		,
-		init : function(){
+		  scrindex : 0
+		
+		, init : function(){
 			this.echo("init DBScript...");
-			this.onLoad(this.unload, true)
-			this.dependancies = {};
-			this.Dependancy = function(objame, filename, constructor){
-				this.init(objame, filename, constructor);
+			this.onLoad(this.unload, true);
+			this.registered = {};
+			this.RegisteredObject = function(objname, filename, constructor){
+				this.init(objname, filename, constructor);
 				return this;
 			};
-			this.Dependancy.prototype = {
-				init : function(objame, filename, constructor){
-					this.name     = objame;
+			this.RegisteredObject.prototype = {
+				init : function(objname, filename, constructor){
+					this.name     = objname;
 					this.filename = filename;
 					this.ldstatus = 0; // 0=uninited;1=start;2=loaded;
 					this.instance = constructor;
@@ -31,12 +91,12 @@ if(!DBScriptHandler){
 				, setStatus : function(ldstatus){
 					this.ldstatus = ldstatus; // 0=uninited;1=start;2=loaded;
 				}
-			}
+			};
 		}
 	
 		,
 		createInstance : function(className) {
-			return (this.dependancies[className]) ? new this.dependancies[className].instance() : new this.emptyFunction();
+			return (this.isRegistered(className)) ? new this.registered[className].instance() : new this.emptyFunction();
 		}
 	
 		,
@@ -49,9 +109,6 @@ if(!DBScriptHandler){
 		,
 		unload : function(){
 			delete DBScript;
-			/* console.debug(this);
-			alert('Unloaded DBScript');*/
-			
 		}
 		
 		,
@@ -90,7 +147,7 @@ if(!DBScriptHandler){
 			  var script = document.getElementById(scriptid);
 			  // alert(script);
 			  script.onreadystatechange = function() {
-			    if (this.readyState == "complete") {
+			    if (this.readyState == "complete" || this.readyState == "loaded") {
 			      loaded  = true; 
 			      fn(); // call the onload handler
 			    }
@@ -115,7 +172,8 @@ if(!DBScriptHandler){
 		
 		,
 		getBase : function(){
-		    var i, base, src = src || __me, scripts = document.getElementsByTagName("script");
+		    console.debug(this.getSelf());
+			var i, base, src = src || __me, scripts = document.getElementsByTagName("script");
 		    for (i=0; i < scripts.length; i++){if (scripts[i].src.match(src)){ base = scripts[i].src.replace(src, "");break;}}
 		    return base;
 		} 
@@ -134,10 +192,12 @@ if(!DBScriptHandler){
 		
 		,
 		include : function(src){
-			 if(this.isLoaded(src)) {
+			var src = this.getSelf() + src; 
+			if(this.isLoaded(src)) {
 			 	this.echo("Already loaded: "+src);
 				return;
 			}
+			
 			var scriptid = "__scriptid"+this.scrindex;
 			this.scrindex++;
 			var script = document.createElement('script');
@@ -151,11 +211,11 @@ if(!DBScriptHandler){
 		,
 		doRegister : function(objname, filename, classInstance, classDef, extendDBScript){
 			var defineAsGlobal = defineAsGlobal || false;
-			if(!this.getDependancy(objname)){
+			if(!this.getRegisteredObject(objname)){
 				
-				this.dependancies[objname] = new this.Dependancy(objname, filename, classDef);
-				DBScriptHandler.prototype[objname] = classInstance;
+				this.registered[objname] = new this.RegisteredObject(objname, filename, classDef);
 				if(classInstance) {
+					DBScriptHandler.prototype[objname] = classInstance;
 					this.echo("Registering: "+objname+" @ "+filename+" through class: "+classInstance.toString());
 					if(classInstance["onWinLoad"]){
 						this.onLoad(classInstance["onWinLoad"]);
@@ -165,7 +225,7 @@ if(!DBScriptHandler){
 					// DBScript.echo("registering: "+objname+" @ "+filename);
 				}
 			}
-			return this.getDependancy(objname);
+			return this.getRegisteredObject(objname);
 		}
 		
 		,
@@ -176,16 +236,16 @@ if(!DBScriptHandler){
 			var src     = (myClass && myClass.src) ? myClass.src : "";
 			var gscope  = (myClass && myClass.gscope) ? true : false;
 			// this.echo(ClassFunc.toString(), true);
-			this.doRegister(name, src, myClass, ClassFunc, gscope);
+			return this.doRegister(name, src, myClass, ClassFunc, gscope);
 		}
 		
 		,
 		addFunctionsToContext : function(classDef, context){
 			var context = context || window;
 			//alert(context);
-			for(func in classDef){
+			for(var func in classDef){
 				if(classDef[func] && classDef[func].constructor==Function){
-					if(func!="onWinLoad" && !context[func]) {
+					if(!context[func]) {
 						this.echo("Adding: "+func+" from "+ classDef.toString());
 						context[func] = classDef[func];
 					}
@@ -203,27 +263,31 @@ if(!DBScriptHandler){
 		
 		,
 		isRegistered : function(objname) {
-			return this.getDependancy(objname);
+			return this.getRegisteredObject(objname);
 		}
 		
 		, 
-		getDependancy : function(objname){
-			return this.dependancies[objname];
+		getRegisteredObject : function(objname){
+			return this.registered[objname];
 		}
 	}
 	
-	var DBScript = new DBScriptHandler(false);
-	DBScript.include("DBScript/array_v2.js");
-	DBScript.include("DBScript/string.js");
-	DBScript.include("DBScript/dollar_v2.js");
-	DBScript.include("DBScript/events_v2.js");
-	DBScript.include("DBScript/keyboard.js");
-	DBScript.include("DBScript/classes_v2.js");
-	DBScript.include("DBScript/DOMHelper_v2.js");
-	DBScript.include("DBScript/tables.js");
-	DBScript.include("DBScript/xhr_v2.js");
-	DBScript.include("DBScript/popupwin.js");
-	DBScript.include("DBScript/aliases.js");
-	DBScript.include("DBScript/formelement.js");
+	var DBScript = new DBScriptHandler(true);
+	DBScript.include("corelibs.js");
+	DBScript.include("addons.js");
+	DBScript.include("userlib.js");
+	// DBScript.include("DBScript/array_v2.js");
+	// DBScript.include("DBScript/string.js");
+	// DBScript.include("DBScript/dollar_v2.js");
+	// DBScript.include("DBScript/events_v2.js");
+	// DBScript.include("DBScript/keyboard.js");
+	// DBScript.include("DBScript/classes_v2.js");
+	// DBScript.include("DBScript/DOMHelper_v2.js");
+	// DBScript.include("DBScript/tables.js");
+	// DBScript.include("DBScript/xhr_v2.js");
+	// DBScript.include("DBScript/popupwin.js");
+	// DBScript.include("DBScript/aliases.js");
+	// DBScript.include("DBScript/formelement.js");
+	// DBScript.include("DBScript/eventhandler.js");
 }
 

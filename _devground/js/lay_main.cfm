@@ -1,6 +1,5 @@
 <cfparam name="attributes.javascripts" default="#ArrayNew(1)#">
 <cfset ArrayAppend(attributes.javascripts,"DBScript/DBScript.js")>
-<cfset ArrayAppend(attributes.javascripts,"eNS/ens.js")>
 <cfoutput>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -25,7 +24,7 @@
 
 </style>
 <!--- <link type="text/css" rel="stylesheet" href="media/css/global.css" /> --->
-<cfloop array="#attributes.javascripts#" index="jsfile"><script src="#jsfile#" type="text/javascript"></script></cfloop>
+<cfloop array="#attributes.javascripts#" index="jsfile"><script id="DBScript" src="#jsfile#" type="text/javascript"></script></cfloop>
 <!--- <script type="text/javascript">
 DBScript.register(function() {
 	this.version = "1.0";
@@ -234,13 +233,14 @@ function keyPress_cb(e){
 </div>
 
 <script type="text/javascript">
+/*
+
 var s = DBScript.createInstance("FormElement");
 var s2 = DBScript.createInstance("FormElement");
 s.init("email-input");
 s2.init("date-input");
 console.debug(s);
 
-/*
 DBScript.ElementValidator.init("email-input");
 aFunc = function(v) {return v + ": value passed";}
 DBScript.ElementValidator.setValidator("myfunction", aFunc);

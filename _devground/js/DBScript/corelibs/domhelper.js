@@ -1,7 +1,10 @@
 DBScript.register(function() {
+	DBScript.import("dollar");
+	
 	this.version = "2.0";
 	this.name    = "DOMHelper";
-	this.src     = "DOMHelper_v2.js";
+	this.import  = "domhelper";
+	this.src     = "corelibs/domhelper.js";
 	this.gscope  = true;
 	
 	DBScript.addFunctionsToContext( {
@@ -92,5 +95,5 @@ DBScript.register(function() {
 			return el.innerHTML;
 		}
 	}, this);
-});
+}).setStatus(2);;
 

@@ -1,7 +1,12 @@
 DBScript.register(function () {
+	DBScript.import("dollar");
+	DBScript.import("classes");
+	DBScript.import("events");
+	
 	this.version = "2.0";
 	this.name    = "XHRClass";
-	this.src     = "xhr_v2.js";
+	this.import  = "xhr";
+	this.src     = "corelibs/xhr.js";
 	this.gscope  = true; // appends class functions to global scope so that they can be called directly
 	
 	DBScript.include("DBScript/taconite-client-min.js");
@@ -73,7 +78,7 @@ DBScript.register(function () {
 			sendAjaxRequest(true);
 		}
 	}, this);
-});
+}).setStatus(2);
 
 
 

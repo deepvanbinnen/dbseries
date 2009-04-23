@@ -3,9 +3,9 @@ DBScript.register(function() {
 	
 	this.version = "2.0";
 	this.name    = "Events";
-	this.src     = "events_v2.js";
+	this.import  = "events";
+	this.src     = "corelibs/events.js";
 	this.gscope  = true;
-	
 	
 	DBScript.addFunctionsToContext( {
 		toString : function(){
@@ -131,4 +131,4 @@ DBScript.register(function() {
 			return DBScript.Keyboard.getKey(e);
 		}
 	}, this);
-});
+}).setStatus(2);;

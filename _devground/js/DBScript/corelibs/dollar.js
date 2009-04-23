@@ -11,10 +11,10 @@
 DBScript.register(function(){
 	this.version = "2.0";
 	this.name    = "Dollar";
-	this.src     = "dollar_v2.js";
+	this.import  = "dollar";
+	this.src     = "corelibs/dollar.js";
 	this.gscope  = true;
 	
- 
 	DBScript.addFunctionsToContext( {
 		toString : function(){
 			return this.name;
@@ -57,7 +57,7 @@ DBScript.register(function(){
 			return elmArray;
 		}
 	}, this);
-});
+}).setStatus(2);
 
 
  
