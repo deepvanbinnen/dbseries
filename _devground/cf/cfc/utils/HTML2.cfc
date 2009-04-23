@@ -1,6 +1,8 @@
 <cfcomponent>
-	<cfset variables.keyregex = "(%([0-9a-zA-Z_]+)%)[\\]{0,1}">
-	<cfset variables.pattern = CreateObject("java","java.util.regex.Pattern").Compile(JavaCast("string", keyregex))>
+	<cfset variables.keywrapchar = "%">
+	<cfset variables.keyregex    = "(#variables.keywrapchar#([0-9a-zA-Z_]+)#variables.keywrapchar#)[\\]{0,1}">
+	<cfset variables.pattern     = CreateObject("java","java.util.regex.Pattern").Compile(JavaCast("string", keyregex))>
+	
 	
 	<cffunction name="rxReplaceWithStruct" hint="takes a string and struct and replaces StructKeys with corresponding values in the string, where %structkey% is wrapped in %">
 		<cfargument name="str" type="string" hint="string in which to replace structkeys with corresponding values">
@@ -28,14 +30,16 @@
 	</cffunction>
 	
 	<cffunction name="collectionToStruct">
-		<cfargument name="col" type="any" hint="any iterable">
+		<cfargument name="collection" type="any" hint="any collection">
+		<cfargument name="keylist" type="string" hint="any collection">
 		
 		<cfset var Local = StructNew()>
 		<cfset Local.setOf = CreateObject("component", "dbseries.cf.cfc.commons.SetOf").init()>
-		<cfset Local.it =  Local.setOf.iterator(arguments.col)>
+		
 		
 		<cfset Local.out = StructNew()>
 		
+		<cfset Local.it =  CreateObject("component", "dbseries.cf.cfc.commons.Iterator").init(arguments.keylist)>
 		<cfloop condition="#Local.it.whileHasNext()#">
 			<cfswitch expression="#Local.it.getIterableType()#">
 				<cfcase value="string">

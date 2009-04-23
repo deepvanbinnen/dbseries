@@ -16,10 +16,10 @@
 	<cfset this.isFolder = FALSE>
 	<cfset this.isimage  = FALSE>
 		
-	<cffunction name="init" output="No" returntype="FileObj">
+	<cffunction name="init" output="yes" returntype="FileObj">
 		<cfargument name="directory" type="any" required="false" default="#this.directory#">
 		<cfargument name="name" type="any" required="false" default="#this.name#">
-		<cfargument name="isfolder" type="any" required="false" default="#this.size#">
+		<cfargument name="isfolder" type="any" required="false" default="#this.isFolder#">
 		<cfargument name="size" type="any" required="false" default="#this.size#">
 		<cfargument name="webroot" type="any" required="false" default="">
 		
@@ -36,6 +36,7 @@
 		
 		<cfset setWebpath()>
 		<cfset setFullName()>
+		<cfoutput>aaaa: #getName()#: #ListLast(getName(),".")#<br /></cfoutput>
 		<cfif ListLen(getName(),".") GT 1>
 			<cfset setExtension(ListLast(getName(),"."))>
 		</cfif>
