@@ -1,0 +1,2 @@
+<cfoutput>#self#</cfoutput>
+hallo
