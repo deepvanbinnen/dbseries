@@ -1,3 +1,3 @@
 jajaja
 
-<cfoutput>#x# #y#</cfoutput>
+<!--- <cfdump var="#attributes#"> --->

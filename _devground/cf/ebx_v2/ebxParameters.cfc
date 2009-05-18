@@ -1,45 +1,53 @@
-<cfcomponent displayname="ebxParameters" hint="I provide an interface for the parameters used in an ebxRequest">
+<cfcomponent displayname="ebxParameters" hint="I provide an interface for parameters">
 	<cfset variables.ebx  = "">
-	
-	<cfset variables.form   = form>
-	<cfset variables.url    = url>
 	<cfset variables.params = StructNew()>
 	
 	<cffunction name="init">
-		<cfargument name="ebx" required="true" type="ebx">
+		<cfargument name="ebx"        required="true">
+		<cfargument name="parameters" required="false" type="struct" default="#StructNew()#">
 		
 		<cfset variables.ebx = arguments.ebx>
-		<cfset variables.ebx.setDebug("Initialising parameters", 0)>
-		<cfset copyParameters(variables.url)>
-		<cfset variables.ebx.setDebug("URL parameters copied", 0)>
-		<cfset copyParameters(variables.form)>
-		<cfset variables.ebx.setDebug("Form parameters copied", 0)>
+		<cfset setParameters(arguments.parameters)>
 		
 		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="copyParameters">
-		<cfargument name="scope">
-		<cfset var local = StructNew()>
-		<cfloop collection="#arguments.scope#" item="local.varname">
-			<cfif NOT StructKeyExists(variables.params,local.varname)>
-				<cfset StructInsert(variables.params,local.varname,arguments.scope[local.varname])>
+	<cffunction name="getParameter" output="false" hint="gets parameter or returns the given default value">
+		<cfargument name="name"   required="true"  type="string"                  hint="parameter to get">
+		<cfargument name="value"  required="false" type="any"     default=""      hint="parameter's default value " >
+		<cfargument name="create" required="false" type="boolean" default="false" hint="add parameter if it doesn't exist">
+		
+		<cfif NOT hasParameter(arguments.name)>
+			<cfif arguments.create>
+				<cfset setParameter(arguments.name, arguments.value)>
+			<cfelse>
+				<cfreturn arguments.value>
 			</cfif>
-		</cfloop>
-		<cfreturn this>
-	</cffunction>
-	
-	<cffunction name="getParameters">
-		<cfreturn variables.params>
-	</cffunction>
-	
-	<cffunction name="getParameter">
-		<cfargument name="name" required="true" hint="the parameter to lookup">
-		<cfargument name="value" required="false" hint="the default value for the parameter" default="">
-		<cfif NOT StructKeyExists(variables.params,arguments.name)>
-			<cfset StructInsert(variables.params,arguments.name,arguments.value)>
 		</cfif>
 		<cfreturn variables.params[arguments.name]>
 	</cffunction>
 	
+	<cffunction name="setParameter" output="false" hint="set parameter, by default overwrites existing parameters">
+		<cfargument name="name"      required="true"  type="string"  hint="parametername">
+		<cfargument name="value"     required="true"  type="any"     hint="parametervalue">
+		<cfargument name="overwrite" required="false" type="boolean" default="true" hint="overwrite parameter?">
+		
+		<cfset StructInsert(variables.params,arguments.name,arguments.value,arguments.overwrite)>
+	</cffunction>
+	
+	<cffunction name="getParameters" output="false" hint="get parameterstruct">
+		<cfreturn variables.params>
+	</cffunction>
+	
+	<cffunction name="setParameters" output="false" hint="sets box-parameters from struct">
+		<cfargument name="parameters" required="true"  type="struct">
+		<cfargument name="overwrite"  required="false" type="boolean" default="false" hint="overwrite parameter">
+		
+		<cfset StructAppend(variables.params,arguments.parameters,arguments.overwrite)>
+	</cffunction>
+	
+	<cffunction name="hasParameter" output="false" hint="check if a parameter exists">
+		<cfargument name="name" required="true" type="string" hint="the parameter to lookup">
+		<cfreturn StructKeyExists(variables.params,arguments.name)>
+	</cffunction>
 </cfcomponent>
