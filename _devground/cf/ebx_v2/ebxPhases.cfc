@@ -1,4 +1,4 @@
-<cfcomponent extends="ebxCore" displayname="ebxPhase" hint="I represent the phases for a request">
+<cfcomponent displayname="ebxPhase" hint="I represent the phases for a request">
 	<cfset variables.ebx      = "">
 	
 	<cfset variables.phases    = ListToArray("appinit,init,preprocess,preplugin,preaction,mainrequest,postaction,postplugin,postprocess")>

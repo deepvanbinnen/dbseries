@@ -1,112 +1,68 @@
 <cfcomponent displayname="ebxCore" hint="I represent an abstract interface for ebx">
-	<cfset variables.ebx = "">
+	<cfset variables.parser = "">
 	<cfset variables.interfaces = StructNew()>
 	
 	<cffunction name="init">
-		<cfargument name="ebx" type="ebx" required="true">
-		<cfset variables.ebx = arguments.ebx>
+		<cfargument name="ebx" type="ebxParser" required="true">
+			<cfset variables.parser = arguments.ebx>
 		<cfreturn this>
 	</cffunction>
 	
 	<cffunction name="getInterface" hint="get an ebx interface">
 		<cfargument name="name" required="false" type="string" default="" hint="name of the interface to return">
-		<!--- <cfset var local = StructNew()>
-		<cfif NOT StructKeyExists(variables.interfaces, arguments.name)>
-			<cfset local.interface = variables.ebx.getInterface(arguments.name)>
-			<cfif NOT IsBoolean(local.interface)>
-				<cfset StructInsert(variables.interfaces, arguments.name, local.interface)>
-			</cfif>
-			<cfreturn local.interface>
-		<cfelse>
-			<cfreturn variables.interfaces[arguments.name]>
-		</cfif> --->
-		<cfreturn getCoreInterface(arguments.name)>
-	</cffunction>
-	
-	<cffunction name="getCoreInterface" hint="get an ebx interface">
-		<cfargument name="name" required="false" type="string" default="" hint="name of the interface to return">
-		<cfreturn variables.ebx.getInterface(arguments.name)>
+		<cfreturn variables.parser.getInterface(arguments.name)>
 	</cffunction>
 	
 	<cffunction name="getAppPath">
-		<cfreturn variables.ebx.getAppPath()>
+		<cfreturn variables.parser.getAppPath()>
 	</cffunction>
 	
 	<cffunction name="getCurrentDir">
-		<cfreturn getAppPath() & getCircuitDir()>
+		<cfreturn variables.parser.getCurrentDir()>
 	</cffunction>
 	
 	<cffunction name="getCurrentCircuit">
-		<cfreturn variables.ebx.thisCircuit>
+		<cfreturn variables.parser.getCurrentDir()>
 	</cffunction>
 	
 	<cffunction name="getCircuitDir">
-		<cfreturn variables.ebx.circuitdir>
+		<cfreturn variables.parser.getCurrentDir()>
 	</cffunction>
 	
 	<cffunction name="getLayoutDir">
-		<cfreturn variables.ebx.layoutdir>
+		<cfreturn variables.parser.getCurrentDir()>
 	</cffunction>
 	
 	<cffunction name="getLayoutFile">
-		<cfreturn variables.ebx.layoutfile>
+		<cfreturn variables.parser.getCurrentDir()>
 	</cffunction>
-	
-	<cffunction name="updateGlobalParameter">
-		<cfargument name="name" required="true"  type="string" default="" hint="coldfusion mapping to the root of the box">
-		<cfargument name="value" required="true"  type="any" default="" hint="coldfusion mapping to the root of the box">
-		<cfargument name="overwrite" required="false" type="boolean" default="true" hint="coldfusion mapping to the root of the box">
-		<cfreturn variables.ebx.updateGlobalParameter(arguments.name, arguments.value, arguments.overwrite)>
-	</cffunction>	
 	
 	<!--- I/O Pagecontext --->	
 	<cffunction name="include">
 		<cfargument name="template" required="true" hint="the parameter to lookup">
-		<cfargument name="flush" type="boolean" required="false" hint="the parameter to lookup" default="false">
-		<cfreturn variables.ebx.getInterface("pagecontext")._ebx_include(arguments.template, arguments.flush)>
+		<cfreturn variables.parser.getInterface("pagecontext").ebx_include(arguments.template)>
 	</cffunction>
 	
-	<cffunction name="print">
+	<cffunction name="write">
 		<cfargument name="output" required="true" type="string" default="" hint="output to print">
-		<cfset variables.ebx.getInterface("pagecontext")._ebx_print(arguments.output)>
+		<cfset variables.parser.getInterface("pagecontext").ebx_write(arguments.output)>
 	</cffunction>
 	
-	<cffunction name="flush">
-		<cfset variables.ebx.getInterface("pagecontext")._ebx_flush()>
-	</cffunction>
-	
-	<cffunction name="clearBuffer">
-		<cfset variables.ebx.getInterface("pagecontext")._ebx_clearBuffer()>
-	</cffunction>
-	
-	<cffunction name="assign">
+	<cffunction name="put">
 		<cfargument name="name" required="true" hint="the parameter to lookup">
 		<cfargument name="value" required="false" hint="the default value for the parameter" default="">
 		<cfargument name="overwrite" required="true" hint="the parameter to lookup" default="true">
 		<cfargument name="append" required="true" hint="the parameter to lookup" default="false">
-			<cfset variables.ebx.getInterface("pagecontext")._ebx_assign(arguments.name, arguments.value, arguments.overwrite, arguments.append)>
+			<cfset variables.parser.getInterface("pagecontext").ebx_put(arguments.name, arguments.value, arguments.overwrite, arguments.append)>
 		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="fetch">
+	<cffunction name="get">
 		<cfargument name="name" required="true" hint="the parameter to lookup">
 		<cfargument name="value" required="false" hint="the default value for the parameter" default="">
 		<cfargument name="create" required="false" hint="create the parameter" default="true">
 		
-		<cfreturn variables.ebx.getInterface("pagecontext")._ebx_fetch(arguments.name, arguments.value, arguments.create)>
-	</cffunction>
-	
-	<cffunction name="getLastOuput">
-		<cfreturn variables.ebx.getInterface("pagecontext")._ebx_getOutput()>
-	</cffunction>
-	
-	<cffunction name="getAllOutput">
-		<cfreturn variables.ebx.getInterface("pagecontext")._ebx_getAllOutput()>
-	</cffunction>
-	
-	
-	<cffunction name="getPC">
-		<cfreturn variables.ebx.getInterface("pagecontext")._ebx_getPageContext()>
+		<cfreturn variables.parser.getInterface("pagecontext").ebx_get(arguments.name, arguments.value, arguments.create)>
 	</cffunction>
 	
 	<cffunction name="assignOutput">
@@ -125,31 +81,13 @@
 	
 	<!--- Request related --->
 	<cffunction name="createRequest">
-		<cfargument name="action"     required="true"  type="string">
-		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#">
-		<cfargument name="flush"      required="false" type="boolean" default="true">
-		<cfargument name="contentvar" required="false" type="string"  default="">
-		<cfargument name="append"     required="false" type="boolean" default="false">
 		
-		<cfset var local = StructNew()>
-		<cfset local.request = createObject("component", "ebxRequest").init(variables.ebx, arguments.action, arguments.params, arguments.flush, arguments.contentvar, arguments.append)>
-		<cfif local.request.isExecutable()>
-			<cfset addRequest(local.request)>
-			<cfset setLastCreatedRequest(local.request)>
-			<cfreturn true>
-		</cfif>
-		<cfset setDebug("Unable to create request for: '#arguments.action#'", 0)>
-		<cfreturn false>
 	</cffunction>
 	
 	<cffunction name="addRequest">
-		<cfargument name="request" required="true" type="any">
-		<cfset getInterface("reqhandler").addRequest(arguments.request)>
-		<!--- <cfset setLastCreatedRequest(arguments.request)> --->
-		<!--- <cfset setCurrentRequest(arguments.request)> --->
+		
 	</cffunction>
 	
-
 	<cffunction name="validateRequest">
 		<cfargument name="request" required="true" type="any">
 		<cfreturn arguments.request.isExecutable()>
@@ -225,7 +163,6 @@
 		<cfreturn false>
 	</cffunction>
 	
-	
 	<cffunction name="parsePlugins">
 		<cfset var result = include(template=getParameterFile("files.plugins"))>
 		<cfif NOT result.error>
@@ -276,22 +213,6 @@
 	
 	<cffunction name="parsePlugin">
 		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="getFormParameters">
-		<cfreturn getInterface("parameters").getFormParameters()>
-	</cffunction>
-	
-	<cffunction name="getURLParameters">
-		<cfreturn getInterface("parameters").getURLParameters()>
-	</cffunction>
-	
-	<cffunction name="copyURLParameters">
-		<cfset getInterface("parameters").copyParameters(getURLParameters())>
-	</cffunction>
-	
-	<cffunction name="copyFormParameters">
-		<cfset getInterface("parameters").copyParameters(getFormParameters())>
 	</cffunction>
 	
 	<cffunction name="getParameterFile">

@@ -15,9 +15,9 @@
 	
 		<cfset mycontent = "hello">
 		<cfset request.ebx.do(action="home.test", contentvar="mycontent", append="true")>
-		<!--- <cfdump var="#request.ebx.include(template="dsp_joker.cfm")#"> --->
-		
-		
+		<cfset request.ebx.include(template="dsp_joker.cfm", contentvar="somecontent", append="true")>
+		<cfoutput>#somecontent#</cfoutput>
+		<p>testing</p>
 		<cfoutput>#mycontent#</cfoutput>
 	</cfdefaultcase>
 </cfswitch>

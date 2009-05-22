@@ -1,5 +1,6 @@
 <cfcomponent displayname="ebxRequest" hint="I am the main ebx request and handle the execution of the default/given fuseaction">
-	<cfset variables.ebx         = "">
+	<cfset variables.parser     = "">
+	<cfset variables.ebx        = "">
 		
 	<cfset variables.act        = "">
 	<cfset variables.fullact    = "">
@@ -14,9 +15,10 @@
 	<cfset variables.executable  = false>
 	
 	<cffunction name="init">
-		<cfargument name="ebx"    type="any"    required="true">
+		<cfargument name="parser"    type="any"    required="true">
 		<cfargument name="action" type="string" required="true">
-			<cfset variables.ebx = arguments.ebx>
+			<cfset variables.parser = arguments.parser>
+			<cfset variables.ebx    = variables.parser.getEbx()>
 			<cfset parseAction(arguments.action)>
 		<cfreturn this>
 	</cffunction>

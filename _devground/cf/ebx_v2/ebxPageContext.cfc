@@ -13,8 +13,7 @@
 					<cfinclude template="#arguments.template#">
 					<cfoutput><!-- DEBUG: #arguments.template# --></cfoutput>
 					<cfcatch type="any">
-						<cfdump var="#cfcatch#">
-						<cfset result.output = "#cfcatch.message# -#cfcatch.detail#">
+						<cfoutput><p>#cfcatch.message# -#cfcatch.detail#</p></cfoutput>
 						<cfset result.errors = true>
 						<cfset result.caught = cfcatch>
 						<!--- <cfrethrow> --->

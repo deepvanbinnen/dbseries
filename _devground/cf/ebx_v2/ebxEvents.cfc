@@ -1,5 +1,5 @@
-<cfcomponent extends="ebxCore" displayname="ebxEvents" hint="I handle ebxEvents">
-	<cfset variables.ebx = "">
+<cfcomponent displayname="ebxEvents" hint="I handle ebxEvents">
+	<cfset variables.pc  = createObject("component", "ebxPageContext")>
 	
 	<cfset variables.errors = StructNew()>
 	<cfset variables.errors.UNKNOWN_ERROR = "Unknown error!">
@@ -7,11 +7,8 @@
 	<cfset variables.errors.NO_REQUEST    = "No action to be executed!">
 	
 	<cffunction name="init">
-		<cfargument name="ebx" required="true">
-		
-		<cfset variables.ebx = arguments.ebx>
-		<cfset super.init(variables.ebx)>
-		
+		<cfargument name="parser" required="true">
+			<cfset variables.parser = arguments.parser>
 		<cfreturn this>
 	</cffunction>	
 	
@@ -21,207 +18,113 @@
 	</cffunction>
 	
 	<cffunction name="OnBoxInit" hint="Initialize eBox">
-		<cfargument name="ebx" required="true">
+		<cfargument name="attributes"     required="false" type="struct"  default="#StructNew()#" hint="default attributes">
+		<cfargument name="scopecopy"      required="false" type="string"  default="url,form" hint="list of scopes to copy to attributes">
+		<cfargument name="parse_settings" required="false" type="boolean" default="true"     hint="parse settingsfile?">
 		
-		<cfset setDebug("Initialise 'static' box...")>
-		<cfset setDebug("Get requesthandler...")>
-		<!--- <cfif NOT getCoreInterface("reqhandler").hasRequests()>
-			
-		</cfif> --->
+		<cfset var result = StructNew()>
+		<cfset result.attr = variables.parser.getAttributes(arguments.attributes)>
+		<cfloop list="#arguments.scopecopy#" index="result.item">
+			<cfset StructAppend(result.attr, variables.parser.getAttribute(result.item, StructNew()))>
+		</cfloop>
+		<cfset variables.parser.setAttributes(result.attr)>
 		
-		<!--- <cfset init(arguments.ebx)>
-		<cfset variables.ebx.syncParameters(getParameter("EXPOSED_PARAMS"))> --->
-		
-		<cfif parseCircuits()>
-			<cfset parseLayouts()>
-			<cfset parsePlugins()>
-			
-			<cfreturn true>
-		<cfelse>
-			<cfreturn variables.ebx.setFatalError(variables.errors.NO_CIRCUITS)>
+		<cfif arguments.parse_settings>
+			<cfset result.settings = variables.parser.include(variables.parser.getParameter("settingsfile"))>
 		</cfif>
 		
+		<cfreturn true>		
 	</cffunction>
 	
-	<cffunction name="OnBoxRequestInit" hint="A call to the do-method starts here">
-		<cfargument name="ebx"        required="false">
-		<cfargument name="ebxRequest" required="false">
-			<!--- validate main request --->
-			<cfset var local = StructNew()>
-			
-			<cfset setDebug("New box request...")>
-			<cfif NOT hasRequests()>
-				<!--- START OF PREPROCESS --->
-				<cfset setDebug("There is no main request, so we set one up...")>
-				<cfset setDebug("Is this a custom tag call?")>
-				<cfif NOT IsBoolean(fetch("caller", FALSE))>
-					<cfset setDebug("It is. What now? Store it somewhere perhaps...")>
-				<cfelse>
-					<cfset setDebug("Doesn't look like it. Is this actually possible?")>
-				</cfif>
-				<cfset setDebug("Is this a do()? Why do I need this?!!")>
-				<cfset setDebug("Converting URL and FORM..")>
-				<cfset setAttributes(fetch("url"))>
-				<cfset setAttributes(fetch("form"))>
-				<!--- cfset copyFormParameters()>
-				<cfset copyURLParameters()> --->
-				<!--- <cfset setDebug("Convert attributes to parameters used in the request")> --->
-				<!--- <cfset setDebug("new way to store and pass through variables")> --->
-				<cfset setDebug("Parse settings")>
-				<cfset parseSettings()>
-				<cfset setDebug("Setup the main request so that the output is stored in the layout variable")>
-				<cfset local.req = createObject("component", "ebxRequest").init(variables.ebx, getAttribute(variables.ebx.getActionVar(), variables.ebx.getDefaultAct()), StructNew())>
-				<cfset setDebug("Setup the main request so that the output is stored in the layout variable")>
-				<cfif NOT local.req.isExecutable()>
-					<cfset setDebug("Request is not executable, spit out the request error!")>
-				</cfif>
-				<cfset variables.ebx.setOriginalRequest(local.req)>
-				<!---  --->
-				<!--- <cfset setDebug("Set initial parameters()")> --->
-				<!--- END OF PREPROCESS --->
-				
-				<!--- START OF BOXREQUEST --->
-				<cfset local.req = OnBoxRequest(local.req)>
-				<!--- END OF BOXREQUEST --->
-				
-				<!--- START OF POSTPROCESS --->
-				<cfset setDebug("Walk the request stack and finalise request")>
-				
-				<cfdump var="#variables.ebx.getInterface("reqhandler").getRequests()#">
-				
-				<cfset setDebug("Release custom attributes")>
-				<cfset setDebug("Assign the output of the switch file")>
-				<!--- END OF POSTPROCESS --->
-
-				
-				
-				<cfset setDebug("The layout variable now contains the output of the switch-file")>
-				<cfset setDebug("Parse the layout and output it to the caller")>
-
-				<!--- <cfset setDebug("Execute preaction")> --->
-				
-				
-				
-				<!--- <cfif NOT IsDefined("arguments.ebxRequest")>
-					<cfif NOT OnBoxMainRequestInit(variables.ebx)>
-						<cfreturn variables.ebx.setFatalError(variables.errors.UNKNOWN_ERROR)>
-					</cfif>
-					<cfif createRequest(ebx=variables.ebx, action=getMainAction(), flush=false)>
-						<cfset addRequest(getLastCreatedRequest())>
-					<cfelse>
-						<cfreturn variables.ebx.setFatalError(variables.errors.NO_REQUEST)>
-					</cfif>
-				<cfelse>
-					<cfset addRequest(arguments.ebxRequest)>
-				</cfif>
-				<cfset OnBoxPreprocess(getCurrentRequest())>
-				<cfset OnBoxPreAction(getCurrentRequest())>
-				<cfset OnBoxRequest(getCurrentRequest())>
-				<cfset OnBoxPostAction(getCurrentRequest())>
-				<cfset OnBoxPostprocess(getCurrentRequest())> --->
-			</cfif>
-			
-	</cffunction>
-	
-	<cffunction name="OnBoxMainRequestInit" hint="A call to the main do-method starts here">
-		<cfargument name="ebx" required="false">
-		<!--- validate main request --->
+	<cffunction name="OnBoxCreateRequest" hint="get all messages from debugsink">
+		<cfargument name="action"  required="true" type="string" hint="full qualified action">
+		
 		<cfset var local = StructNew()>
-		
-		<cfset setDebug("Main request init...")>
-		
-		<cfset init(arguments.ebx)>
-		<cfset copyFormParameters()>
-		<cfset copyURLParameters()>
-		<cfset parseSettings()>
-		
-		<cfif NOT hasMainAction()>
-			<cfset setMainAction()>
+		<cfset local.hand = variables.parser.getHandlerInterface()>
+		<cfset local.request = local.hand.createRequest(arguments.action)>
+		<cfif local.request.isExecutable()>
+			<cfset local.hand.addRequest(local.request)>
+			<cfreturn true>
 		</cfif>
-
+		<cfreturn false>
+	</cffunction>
+	
+	<cffunction name="OnExecute" hint="get all messages from debugsink">
+		<cfargument name="action"  required="true" type="string" hint="full qualified action">
 		
+		<cfset var local = StructNew()>
+		<cfset local.output = "">
+		<cfif OnBoxCreateRequest(arguments.action)>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPreAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
+			<cfset OnBoxInclude(variables.parser.getIncludeSwitch())>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPostAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
+			<cfreturn true>
+		</cfif>
+		<cfreturn false>
+	</cffunction>
+	
+	<cffunction name="OnExecuteDo" hint="get all messages from debugsink">
+		<cfargument name="action"     required="true" type="string"   hint="the action to execute">
+		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
+		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
+		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
+		
+		<cfif OnBoxCreateRequest(arguments.action)>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPreAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
+			<cfset OnBoxInclude(variables.parser.getIncludeSwitch())>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPostAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
+			<cfset variables.parser.layout = variables.parser.getLastResult().output>
+			<cfreturn true>
+		</cfif>
+		<cfreturn false>
+		
+	</cffunction>
+	
+	<cffunction name="OnBoxInclude" hint="A call to the do-method starts here">
+		<cfargument name="template"   required="false">
+		<cfargument name="parameters" required="false" type="struct" default="#StructNew()#">
+		
+		<cfset var local = StructNew()>
+		<cfset local.original = variables.parser.getAttributes()>
+		<!--- <cfset variables.parser.setAttributes(arguments.parameters, true)> --->
+		<cfset variables.parser.setLastResult(variables.parser._include(arguments.template))>
+		<!--- <cfset variables.parser.setAttributes(local.original, true)> --->
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnBoxPreprocess" hint="preprocess request, set original action">
-		<cfargument name="ebxRequest" required="true" type="ebxRequest">
-		
-		<cfset var local = StructNew()>
-		<cfset setDebug("In preprocess setting originalCircuit and action...")>
-		<cfset updateGlobalParameter("originalCircuit", arguments.ebxRequest.getCircuit())>
-		<cfset updateGlobalParameter("originalAction", arguments.ebxRequest.getAction())>
-		<cfset updateGlobalParameter("originalAct", arguments.ebxRequest.getAct())>
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnBoxPreAction" hint="returns number of errors in sink">
-		<cfargument name="ebxRequest" required="true" type="ebxRequest">
-		
-		<cfset var local = StructNew()>
-		<cfset setDebug("Preaction...")>
-		<cfif isMainRequest()>
-			<cfset setDebug("Is main action start preaction process...")>
-		</cfif>
-		<cfset setDebug("Set custom parameters...")>
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnBoxRequest" hint="get all messages from debugsink">
-		<cfargument name="ebxRequest" required="true" type="ebxRequest">
-		
-		<cfset setDebug("The following occurs for any box request, whether it's done or ... just the main request :)")>
-		<cfset variables.ebx.setCurrentRequest(arguments.ebxRequest)>
-		<cfset setDebug("Ebx properties updated")>
-		<cfset addRequest(arguments.ebxRequest)>
-		<cfset setDebug("Added request to stack")>
-		<cfset arguments.ebxRequest.initParameters()>
-		<cfset setDebug("Custom attributes set")>
-		
-		<cfset setDebug("Get validated fuseaction")>
-		<cfset setDebug("Execute preaction")>
-		<cfset setDebug("Validate switch")>
-		<cfset parseRequest(arguments.ebxRequest)>
-		
-		<cfset setDebug("Include the switch file")>
-		<cfset setDebug("Execute postaction")>
-		
-		<cfreturn arguments.ebxRequest>
+		<cfreturn true>
 	</cffunction>
 
 	<cffunction name="OnBoxPostAction" hint="get all messages from debugsink">
-		<cfargument name="ebxRequest" required="true" type="ebxRequest">
-		
-		<cfset setDebug("Postaction...")>
-		
-		<cfif arguments.ebxRequest.getFlush()>
-			<cfset setDebug("Output request...")>
-			<cfset print(arguments.ebxRequest.getOutput())>
-		<cfelseif arguments.ebxRequest.getContentVar() neq "">
-			<cfset setDebug("Assign output to variable...")>
-		<cfelse>
-			<cfif NOT IsMainRequest()>
-				<cfset setDebug("WARNING: No output specified... output suppressed...")>
-			</cfif>
-		</cfif>
-		
-		<cfset setDebug("Release custom parameters...")>
-		
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnBoxPostprocess" hint="get all messages from debugsink">
-		<cfargument name="ebx" required="false">
-			<cfif NOT IsMainRequest()>
-				<cfset setDebug("Walk handler stack and call OnBoxPostAction for request")>
-			</cfif>
-			<cfset updateGlobalParameter("layout", getCurrentRequest().getOutput())>
-			<cfset print(getParameter("layout"))>
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnBoxPlugin" hint="get all messages from debugsink">
-		<cfargument name="ebx" required="false">
 		<cfreturn true>
 	</cffunction>
-	
 </cfcomponent>

@@ -45,15 +45,6 @@
 		<cfreturn variables.MAXREQUESTS>
 	</cffunction>
 	
-	<cffunction name="getAppPath">
-		<cfreturn this.appPath>
-	</cffunction>
-	
-	<cffunction name="setAppPath" access="public">
-		<cfargument name="appPath" required="true"  type="string" default="" hint="coldfusion mapping to the root of the box">
-		<cfset this.appPath = arguments.appPath>
-	</cffunction>
-	
 	<cffunction name="setActionVar" access="public">
 		<cfargument name="actionvar" required="true"  type="string" default="" hint="name of the attributes variable that will hold the action to execute">
 		<cfset variables.actionvar = arguments.actionvar>
