@@ -1,9 +1,14 @@
 <cfcomponent displayname="ebxEvents" hint="I handle ebxEvents">
-	<cfset variables.pi = "">
+	<cfset variables.pc  = createObject("component", "ebxPageContext")>
+	
+	<cfset variables.errors = StructNew()>
+	<cfset variables.errors.UNKNOWN_ERROR = "Unknown error!">
+	<cfset variables.errors.NO_CIRCUITS   = "No circuits defined!">
+	<cfset variables.errors.NO_REQUEST    = "No action to be executed!">
 	
 	<cffunction name="init">
-		<cfargument name="ParserInterface" required="true" type="ebxParserInterface">
-			<cfset variables.pi = arguments.ParserInterface>
+		<cfargument name="parser" required="true">
+			<cfset variables.parser = arguments.parser>
 		<cfreturn this>
 	</cffunction>	
 	
@@ -18,40 +23,47 @@
 		<cfargument name="parse_settings" required="false" type="boolean" default="true"     hint="parse settingsfile?">
 		
 		<cfset var result = StructNew()>
-		<cfset result.attr = variables.pi.getAttributes(arguments.attributes)>
+		<cfset result.attr = variables.parser.getAttributes(arguments.attributes)>
 		<cfloop list="#arguments.scopecopy#" index="result.item">
-			<cfset StructAppend(result.attr, variables.pi.getAttribute(result.item, StructNew()))>
+			<cfset StructAppend(result.attr, variables.parser.getAttribute(result.item, StructNew()))>
 		</cfloop>
-		<cfset variables.pi.setAttributes(result.attr)>
+		<cfset variables.parser.setAttributes(result.attr)>
 		
-		<!--- <cfif arguments.parse_settings>
+		<cfif arguments.parse_settings>
 			<cfset result.settings = variables.parser.include(variables.parser.getParameter("settingsfile"))>
-		</cfif> --->
+		</cfif>
 		
 		<cfreturn true>		
 	</cffunction>
 	
-	<cffunction name="OnAddRequest" hint="Call on application init">
-		<cfargument name="request" required="false">
-			<cfset createContextForRequest(arguments.request)>
-			<cfset updateParser(arguments.request)>
-		<cfreturn true>
-	</cffunction>
-	
-	<cffunction name="OnRemoveRequest" hint="Call on application init">
-		<cfset updateParser(removeRequest())>
-		<cfreturn true>
-	</cffunction>
-	
-	<cffunction name="OnCreateRequest" hint="get all messages from debugsink">
+	<cffunction name="OnBoxCreateRequest" hint="get all messages from debugsink">
 		<cfargument name="action"  required="true" type="string" hint="full qualified action">
 		
 		<cfset var local = StructNew()>
 		<cfset local.hand = variables.parser.getHandlerInterface()>
 		<cfset local.request = local.hand.createRequest(arguments.action)>
 		<cfif local.request.isExecutable()>
-			<cfset OnAddRequest(local.request)>
+			<cfset local.hand.addRequest(local.request)>
+			<cfreturn true>
+		</cfif>
+		<cfreturn false>
+	</cffunction>
+	
+	<cffunction name="OnExecute" hint="get all messages from debugsink">
+		<cfargument name="action"  required="true" type="string" hint="full qualified action">
 		
+		<cfset var local = StructNew()>
+		<cfset local.output = "">
+		<cfif OnBoxCreateRequest(arguments.action)>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPreAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
+			<cfset OnBoxInclude(variables.parser.getIncludeSwitch())>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPostAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
 			<cfreturn true>
 		</cfif>
 		<cfreturn false>
@@ -63,38 +75,36 @@
 		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
 		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
 		
-		<cfif OnCreateRequest(arguments.action)>
-			<cfreturn OnExecuteRequest()>
+		<cfif OnBoxCreateRequest(arguments.action)>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPreAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
+			<cfset OnBoxInclude(variables.parser.getIncludeSwitch())>
+			<cfif variables.parser.getHandlerInterface().isOriginalRequest()>
+				<cfset OnBoxPostAction()>
+				<cfset OnBoxPlugin()>
+			</cfif>
+			<cfset variables.parser.layout = variables.parser.getLastResult().output>
+			<cfreturn true>
 		</cfif>
 		<cfreturn false>
+		
 	</cffunction>
 	
-	<cffunction name="OnExecuteRequest" hint="get all messages from debugsink">
+	<cffunction name="OnBoxInclude" hint="A call to the do-method starts here">
+		<cfargument name="template"   required="false">
+		<cfargument name="parameters" required="false" type="struct" default="#StructNew()#">
+		
 		<cfset var local = StructNew()>
-		<cfset OnExecuteContext(getContextForRequest())>
-		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="OnExecuteContext" hint="A call to the do-method starts here">
-		<cfargument name="context"   required="false">
-		
-		<cfset setContextParameters(context)>
-		<cfset OnInclude(context)>
-		
+		<cfset local.original = variables.parser.getAttributes()>
+		<!--- <cfset variables.parser.setAttributes(arguments.parameters, true)> --->
+		<cfset variables.parser.setLastResult(variables.parser._include(arguments.template))>
+		<!--- <cfset variables.parser.setAttributes(local.original, true)> --->
 		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="OnInclude" hint="A call to the do-method starts here">
-		<cfargument name="stack"   required="false">
-		
-		<cfset var output = "">
-	</cffunction>
-	
 	<cffunction name="OnBoxPreprocess" hint="preprocess request, set original action">
-		<cfset var local = StructNew()>
-		<cfset local.result = variables.pi.include(variables.pi.getParameter("settingsfile"), true, false)>
-		<!--- <cfdump var="#local.result#"> --->
-		
 		<cfreturn true>
 	</cffunction>
 	

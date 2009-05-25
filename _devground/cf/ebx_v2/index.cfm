@@ -1,19 +1,28 @@
 <cfset sf = createObject("component", "cfc.sourceformat").init()>
 
-<!--- Used  --->
+<cfset request.ebx = createObject("component", "ebx").init(appPath="", defaultact="home.tonen")>
+<cfset request.ebx.setup()>
+<cfset request.ebx = request.ebx.getParser()>
+<cfset request.ebx.execute()>
+
+<cfdump var="#request.ebx#">
+
+
+
+
+
+
+<!--- <cfdump var="#a.indexOf(JavaCast( "string", "a"))#"> --->
+<!--- Used
 <cfparam name="attributes" default="#StructNew()#">
 <cfset request.ebx = createObject("component", "ebx").init(appPath="", defaultact="home.tonen")>
 <cfset request.ebx.setup()>
 <cfset request.ebx = request.ebx.getParser(attributes)>
-
-
 <cfsavecontent variable="outHTML">
 	<cfset request.ebx.execute()>
 </cfsavecontent>
-
-
 <cfoutput>#sf.freeTheSource(outHTML)#</cfoutput>
-
+  --->
 
 <!--- <cfset request.ebx = createObject("component", "ebxParser").init(request.ebx)>
 

@@ -14,9 +14,9 @@
 	<!--- 	 --->
 	
 		<cfset mycontent = "hello">
-		<cfset request.ebx.do(action="home.test", contentvar="mycontent", append="true")>
+		<!--- <cfset request.ebx.do(action="home.test", contentvar="mycontent", append="true")>
 		<cfset request.ebx.include(template="dsp_joker.cfm", contentvar="somecontent", append="true")>
-		<cfoutput>#somecontent#</cfoutput>
+		<cfoutput>#somecontent#</cfoutput> --->
 		<p>testing</p>
 		<cfoutput>#mycontent#</cfoutput>
 	</cfdefaultcase>

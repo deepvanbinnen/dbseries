@@ -1,6 +1,5 @@
 <cfcomponent displayname="ebxRequest" hint="I am the main ebx request and handle the execution of the default/given fuseaction">
-	<cfset variables.parser     = "">
-	<cfset variables.ebx        = "">
+	<cfset variables.pi     = "">
 		
 	<cfset variables.act        = "">
 	<cfset variables.fullact    = "">
@@ -14,14 +13,17 @@
 	
 	<cfset variables.executable  = false>
 	
+	<cfset variables.pi = "">
+	
 	<cffunction name="init">
-		<cfargument name="parser"    type="any"    required="true">
-		<cfargument name="action" type="string" required="true">
-			<cfset variables.parser = arguments.parser>
-			<cfset variables.ebx    = variables.parser.getEbx()>
+		<cfargument name="ParserInterface" required="true" type="ebxParserInterface">
+		<cfargument name="action"     required="true" type="string">
+		<cfargument name="parameters" required="false" type="struct" default="#StructNew()#">
+			<cfset variables.pi = arguments.ParserInterface>
 			<cfset parseAction(arguments.action)>
+			<cfset setParameters(arguments.parameters)>
 		<cfreturn this>
-	</cffunction>
+	</cffunction>	
 	
 	<cffunction name="get">
 		<cfargument name="property" type="string" required="true">
@@ -68,7 +70,7 @@
 	</cffunction>
 	
 	<cffunction name="isValidCircuit">
-		<cfreturn variables.ebx.hasCircuit(getCircuit())>
+		<cfreturn variables.pi.hasCircuit(getCircuit())>
 	</cffunction>
 	
 	<cffunction name="parseAction">
@@ -89,8 +91,8 @@
 	</cffunction>
 	
 	<cffunction name="parseCircuit">
-		<cfset variables.circuitdir = variables.ebx.getCircuitDir(variables.circuit)> 
-		<cfset variables.execdir    = variables.ebx.getAppPath() & getCircuitDir()>
+		<cfset variables.circuitdir = variables.pi.getCircuitDir(variables.circuit)> 
+		<cfset variables.execdir    = variables.pi.getAppPath() & getCircuitDir()>
 		<cfset variables.rootPath   = RepeatString("../", ListLen(getCircuitDir(), "/"))>
 	</cffunction>
 	

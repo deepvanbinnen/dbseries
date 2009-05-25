@@ -1,13 +1,15 @@
 <cfcomponent extends="ebxCore" displayname="ebxRequestContext" hint="I am the request context">
-	<cfset variables.parser         = "">
+	<cfset variables.pi     = "">
+	<cfset variables.parser = "">
 	
 	<cfset variables.stack       = ArrayNew(1)><!--- the last request in stack is the main request --->
 	<cfset variables.MAXREQUESTS = 10><!--- maximum requests the stack can handle --->
 	<cfset variables.request     = "">
 	
 	<cffunction name="init">
-		<cfargument name="parser">
-			<cfset variables.parser = arguments.parser>
+		<cfargument name="ParserInterface" required="true" type="ebxParserInterface">
+			<cfset variables.pi = arguments.ParserInterface>
+			<cfset variables.parser = variables.pi.getParser()>
 		<cfreturn this>
 	</cffunction>
 	
@@ -19,13 +21,14 @@
 		
 		<cfif ArrayLen(variables.stack) GT variables.MAXREQUESTS>
 			<!--- <cfset setDebug("Max reached: #variables.MAXREQUESTS#", 0)> --->
+			<cfreturn false>
 		</cfif>
 		<cfset ArrayPrepend(variables.stack, arguments.request)>
 
-		<cfset parser.setCurrentRequest(arguments.request)>
-		<cfset parser.setTargetRequest(arguments.request)>
+		<cfset variables.parser.setCurrentRequest(arguments.request)>
+		<cfset variables.parser.setTargetRequest(arguments.request)>
 		<cfif isOriginalRequest()>
-			<cfset parser.setOriginalRequest(arguments.request)>
+			<cfset variables.parser.setOriginalRequest(arguments.request)>
 		</cfif>
 		
 		<cfreturn true>
@@ -35,7 +38,7 @@
 		<cfargument name="action">
 		<cfargument name="parameters" default="#StructNew()#">
 		
-		<cfreturn createObject("component", "ebxRequest").init(variables.parser, arguments.action, arguments.parameters)>
+		<cfreturn createObject("component", "ebxRequest").init(variables.pi, arguments.action, arguments.parameters)>
 	</cffunction>
 	
 	<cffunction name="getOriginalRequest">
@@ -73,7 +76,6 @@
 	<cffunction name="isOriginalRequest">
 		<cfreturn hasRequests() eq 1>
 	</cffunction>
-	
 	
 	<cffunction name="removeRequest">
 		<cfif hasRequests(variables.stack)>
