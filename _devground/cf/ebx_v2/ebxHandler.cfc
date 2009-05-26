@@ -1,4 +1,4 @@
-<cfcomponent extends="ebxCore" displayname="ebxRequestContext" hint="I am the request context">
+<cfcomponent displayname="ebxRequestContext" hint="I am the request context">
 	<cfset variables.pi     = "">
 	<cfset variables.parser = "">
 	
@@ -17,26 +17,16 @@
 	<cffunction name="addRequest">
 		<cfargument name="request" hint="the current request">
 		
-		<cfset var local = StructNew()>
-		
-		<cfif ArrayLen(variables.stack) GT variables.MAXREQUESTS>
-			<!--- <cfset setDebug("Max reached: #variables.MAXREQUESTS#", 0)> --->
+		<cfif maxRequestsReached()>
 			<cfreturn false>
 		</cfif>
 		<cfset ArrayPrepend(variables.stack, arguments.request)>
-
-		<cfset variables.parser.setCurrentRequest(arguments.request)>
-		<cfset variables.parser.setTargetRequest(arguments.request)>
-		<cfif isOriginalRequest()>
-			<cfset variables.parser.setOriginalRequest(arguments.request)>
-		</cfif>
-		
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="createRequest">
-		<cfargument name="action">
-		<cfargument name="parameters" default="#StructNew()#">
+		<cfargument name="action" type="string" required="true">
+		<cfargument name="parameters" type="struct" required="false" default="#StructNew()#">
 		
 		<cfreturn createObject("component", "ebxRequest").init(variables.pi, arguments.action, arguments.parameters)>
 	</cffunction>
@@ -67,6 +57,10 @@
 	
 	<cffunction name="getRequests">
 		<cfreturn variables.stack>
+	</cffunction>
+	
+	<cffunction name="maxRequestsReached">
+		<cfreturn (hasRequests() GT variables.MAXREQUESTS)>
 	</cffunction>
 
 	<cffunction name="hasRequests">

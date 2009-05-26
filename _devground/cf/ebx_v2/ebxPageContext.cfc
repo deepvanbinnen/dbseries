@@ -46,9 +46,14 @@
 		<cfargument name="name"      type="string"  required="true"  hint="variablename">
 		<cfargument name="value"     type="any"     required="false" default="" hint="value if it doesn't exist">
 		<cfif IsDefined(arguments.name)>
-			<cfreturn GetVariable(arguments.name)>
+			<cfif IsDefined("GetVariable")>
+				<cfreturn GetVariable(arguments.name)>
+			<cfelse>
+				<cfreturn Evaluate(arguments.name)>
+			</cfif>
 		</cfif>
 		<cfreturn arguments.value>
 	</cffunction>
+
 	
 </cfcomponent>

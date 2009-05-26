@@ -26,6 +26,9 @@
 	<cfset this.rootpath            = "">
 	<cfset this.execdir             = "">
 	
+	<cfset this.prePlugins          = ArrayNew(1)>
+	<cfset this.postPlugins         = ArrayNew(1)>
+	
 	<cffunction name="init">
 		<cfargument name="ebx" type="ebx" required="true">
 			<cfset var local = StructNew()>
@@ -39,7 +42,7 @@
 		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
 		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
 		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
-		<cfreturn variables.pi.executeDo(arguments)>
+		<cfreturn variables.pi.executeDo(argumentCollection=arguments)>
 	</cffunction>
 
 	<cffunction name="execute">
@@ -75,7 +78,7 @@
 		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
 		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
 		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
-		<cfreturn variables.pi.executeInclude(arguments)>
+		<cfreturn variables.pi.executeInclude(argumentCollection=arguments)>
 	</cffunction>
 	
 	<cffunction name="setCurrentRequest">

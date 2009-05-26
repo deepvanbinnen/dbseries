@@ -1,3 +1,15 @@
+<cfparam name="start" default="#getTickCount()#">
+
+<cffunction name="tick">
+	<cfparam name="current" default="#getTickCount()#">
+	
+	<cfif IsDefined("current")>
+		<cfoutput>#current-getTickCount()#ms</cfoutput>
+	</cfif>
+	<cfset current = getTickCount()>
+	<cfoutput>#current-start#ms</cfoutput>
+</cffunction>
+
 <cfset sf = createObject("component", "cfc.sourceformat").init()>
 
 <cfset request.ebx = createObject("component", "ebx").init(appPath="", defaultact="home.tonen")>
@@ -5,7 +17,8 @@
 <cfset request.ebx = request.ebx.getParser()>
 <cfset request.ebx.execute()>
 
-<cfdump var="#request.ebx#">
+
+<!--- <cfdump var="#request.ebx#"> --->
 
 
 

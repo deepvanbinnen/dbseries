@@ -33,69 +33,65 @@
 	
 	<cffunction name="OnAddRequest" hint="Call on application init">
 		<cfargument name="request" required="false">
-			<cfset createContextForRequest(arguments.request)>
-			<cfset updateParser(arguments.request)>
-		<cfreturn true>
+		<cfset var hi = variables.pi.getHandlerInterface()>
+		<cfif arguments.request.isExecutable()>
+			<cfif hi.addRequest(arguments.request)>
+				<cfset variables.pi.updateParser(arguments.request)>
+				<cfreturn true>
+			</cfif>
+		</cfif>
+		<cfreturn false>
 	</cffunction>
 	
 	<cffunction name="OnRemoveRequest" hint="Call on application init">
-		<cfset updateParser(removeRequest())>
+		<cfset variables.pi.updateParser(removeRequest())>
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnCreateRequest" hint="get all messages from debugsink">
-		<cfargument name="action"  required="true" type="string" hint="full qualified action">
+		<cfargument name="action"     required="true"  type="string" hint="full qualified action">
+		<cfargument name="parameters" required="false" type="struct"  hint="custom attributes for the fuseaction">
 		
-		<cfset var local = StructNew()>
-		<cfset local.hand = variables.parser.getHandlerInterface()>
-		<cfset local.request = local.hand.createRequest(arguments.action)>
-		<cfif local.request.isExecutable()>
-			<cfset OnAddRequest(local.request)>
-		
+		<cfset var hi = variables.pi.getHandlerInterface()>
+		<cfif NOT hi.maxRequestsReached()>
+			<cfset variables.pi.setLastRequest(hi.createRequest(arguments.action, arguments.parameters))>
 			<cfreturn true>
 		</cfif>
 		<cfreturn false>
 	</cffunction>
 	
-	<cffunction name="OnExecuteDo" hint="get all messages from debugsink">
-		<cfargument name="action"     required="true" type="string"   hint="the action to execute">
-		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
-		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
-		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
+	<cffunction name="OnSetAttributes" hint="get all messages from debugsink">
+		<cfargument name="attributes" required="true" type="struct"   hint="the action to execute">
 		
-		<cfif OnCreateRequest(arguments.action)>
-			<cfreturn OnExecuteRequest()>
-		</cfif>
-		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="OnExecuteRequest" hint="get all messages from debugsink">
 		<cfset var local = StructNew()>
-		<cfset OnExecuteContext(getContextForRequest())>
-		<cfreturn false>
+		<cfset local.attr     = variables.pi.getAttributes()>
+		<cfset local.original = StructNew()>
+		
+		<cfloop collection="#arguments.attributes#" item="local.param">
+			<cfif variables.pi.hasAttribute(local.param)>
+				<cfset StructInsert(local.original, local.param, variables.pi.getAttribute(local.param), TRUE)>
+			</cfif>
+		</cfloop>
+		<cfset variables.pi.storeAttributes(local.original)>
+		<cfset variables.pi.updateAttributes(arguments.attributes)>
+		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="OnExecuteContext" hint="A call to the do-method starts here">
-		<cfargument name="context"   required="false">
-		
-		<cfset setContextParameters(context)>
-		<cfset OnInclude(context)>
-		
+	<cffunction name="OnReleaseAttributes" hint="get all messages from debugsink">
+		<cfset variables.pi.releaseAttributes()>
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnInclude" hint="A call to the do-method starts here">
-		<cfargument name="stack"   required="false">
+		<cfargument name="template" required="false">
 		
-		<cfset var output = "">
+		<cfset var pc = variables.pi.getEbxPageContext()>
+		<cfset variables.pi.setLastResult(pc.ebx_include(arguments.template))>
+		<cfreturn NOT variables.pi.resultHasErrors()>
 	</cffunction>
 	
 	<cffunction name="OnBoxPreprocess" hint="preprocess request, set original action">
-		<cfset var local = StructNew()>
-		<cfset local.result = variables.pi.include(variables.pi.getParameter("settingsfile"), true, false)>
-		<!--- <cfdump var="#local.result#"> --->
-		
-		<cfreturn true>
+		<cfreturn OnInclude(variables.pi.getSettingsFile())>
 	</cffunction>
 	
 	<cffunction name="OnBoxPreAction" hint="returns number of errors in sink">
