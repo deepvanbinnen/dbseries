@@ -9,11 +9,31 @@
 	
 	<cffunction name="init" returntype="ebxParserInterface">
 		<cfargument name="ebxParser" type="ebxParser" required="true">
+		
 		<cfset variables.Parser = arguments.ebxParser>
 		<cfset variables.ebx    = variables.Parser.getEbx()>
 		
 		<cfset initInterfaces()>
 		<cfreturn this>
+	</cffunction>
+	
+	<cffunction name="assignOutput">
+		<cfargument name="output"     required="true" type="string" default="false" hint="wheater to append contentvars output">
+		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
+		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
+		
+		<cfset var pc = getEbxPageContext()>
+		<cfset var out = arguments.output>
+		
+		<cfif arguments.contentvar eq "">
+			<cfset pc.ebx_write(out)>
+		<cfelse>
+			<cfif arguments.append>
+				<cfset out = getVar(arguments.contentvar) & out>
+			</cfif>
+			<cfset pc.ebx_put(arguments.contentvar, out)>
+		</cfif>
+		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="createEventInterface" returntype="boolean">
@@ -56,9 +76,11 @@
 		
 		<cfif evt.onCreateRequest(arguments.action, arguments.params)>
 			<cfif evt.onAddRequest(getLastRequest())>
+				<cfset evt.OnSetAttributes(arguments.params)>
 				<cfif evt.OnInclude(getSwitchFile())>
-					<cfoutput>#variables.LastResult.output#</cfoutput>
+					<cfset assignOutput(variables.LastResult.output, arguments.contentvar, arguments.append)>
 				</cfif>
+				<cfset evt.OnReleaseAttributes(arguments.params)>
 			</cfif>
 		</cfif>
 		<cfreturn true>
@@ -73,7 +95,7 @@
 		<cfset var evt = getEventInterface()>
 		<cfset evt.OnSetAttributes(arguments.params)>
 		<cfif evt.OnInclude(getFilePath(arguments.template))>
-			<cfoutput>#variables.LastResult.output#</cfoutput>
+			<cfset assignOutput(variables.LastResult.output, arguments.contentvar, arguments.append)>
 		</cfif>
 		<cfset evt.OnReleaseAttributes(arguments.params)>
 		
@@ -100,7 +122,15 @@
 					* Parse layout
 					--->
 					<cfset variables.Parser.layout = variables.LastResult.output>
-					<cfoutput>#variables.Parser.layout#</cfoutput>
+					<!--- <cfif getParameter("parselayout")> --->
+						<cfif evt.OnInclude(getLayoutFile())>
+							<cfif evt.OnInclude(getLayout())>
+							
+							</cfif>
+						</cfif>
+					<!--- </cfif> --->
+					
+					<cfset assignOutput(variables.LastResult.output)>
 				<cfelse>
 					<cfdump var="#variables.LastResult#">
 				</cfif>
@@ -110,7 +140,6 @@
 	
 		<cfreturn false>		
 	</cffunction>
-	
 	
 	<cffunction name="include" returntype="struct">
 		<cfargument name="template"      type="string" required="true">
@@ -147,6 +176,14 @@
 			<cfset arguments.name = variables.Parser.getProperty("appath") & arguments.name>
 		</cfif>
 		<cfreturn arguments.name>
+	</cffunction>
+	
+	<cffunction name="getLayout">
+		<cfreturn getFilePath(variables.Parser.getProperty("layoutdir") & variables.Parser.getProperty("layoutfile"), true, false)>
+	</cffunction>
+	
+	<cffunction name="getLayoutFile">
+		<cfreturn getFilePath(getParameter("layoutsfile"), true, false)>
 	</cffunction>
 	
 	<cffunction name="getSwitchFile">
