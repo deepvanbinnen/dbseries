@@ -81,6 +81,7 @@
 					<cfset assignOutput(variables.LastResult.output, arguments.contentvar, arguments.append)>
 				</cfif>
 				<cfset evt.OnReleaseAttributes(arguments.params)>
+				<cfset evt.OnRemoveRequest()>
 			</cfif>
 		</cfif>
 		<cfreturn true>

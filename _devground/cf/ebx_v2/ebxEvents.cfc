@@ -44,7 +44,10 @@
 	</cffunction>
 	
 	<cffunction name="OnRemoveRequest" hint="Call on application init">
-		<cfset variables.pi.updateParser(removeRequest())>
+		<cfset var hi = variables.pi.getHandlerInterface()>
+		<cfif hi.removeRequest()>
+			<cfset variables.pi.updateParser(hi.getRequest())>
+		</cfif>
 		<cfreturn true>
 	</cffunction>
 	
