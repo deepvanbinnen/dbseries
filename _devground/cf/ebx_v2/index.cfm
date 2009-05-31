@@ -15,16 +15,13 @@
 <cfset request.ebx = createObject("component", "ebx").init(appPath="", defaultact="home.tonen")>
 <cfset request.ebx.setup()>
 <cfset request.ebx = request.ebx.getParser()>
+<cfset request.ebx.initialise()>
 <cfset request.ebx.execute()>
 
-
-<!--- <cfdump var="#request.ebx#"> --->
-
-
-
-
-
-
+<!--- <cfloop from="1" to="#ArrayLen(request.ebx.stack.getStack())#" index="i">
+	<cfdump var="#request.ebx.stack.get(i)._dump()#" version="long">
+</cfloop> --->
+<cfdump var="#request.ebx#">
 <!--- <cfdump var="#a.indexOf(JavaCast( "string", "a"))#"> --->
 <!--- Used
 <cfparam name="attributes" default="#StructNew()#">

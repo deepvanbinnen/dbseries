@@ -70,17 +70,12 @@
 	</cffunction>
 	
 	<cffunction name="getParser">
-		<cfargument name="attributes"     required="false" type="struct"  default="#StructNew()#" hint="attributes to use in the parser">
-		<cfargument name="scopecopy"      required="false" type="string"  default="url,form"      hint="list of scopes to copy to attributes">
-		<cfargument name="parse_settings" required="false" type="boolean" default="true"          hint="parse settingsfile">
-		<cfargument name="initialise"     required="false" type="boolean" default="true"          hint="initialise the parser">
+		<cfargument name="attributes" required="false" type="struct"  default="#StructNew()#" hint="attributes to use in the parser">
+		<cfargument name="scopecopy"  required="false" type="string"  default="url,form"      hint="list of scopes to copy to attributes">
+		<cfargument name="nosettings" required="false" type="boolean" default="false"         hint="do not parse settingsfile">
+		<cfargument name="nolayout"   required="false" type="boolean" default="false"         hint="do not parse layout">
 		
-		<cfset var result = StructNew()>
-		<cfset result.parser = createObject("component", "ebxParser").init(this)>
-		<cfif arguments.initialise>
-			<cfset result.parser.initialise(arguments.attributes, arguments.scopecopy, arguments.parse_settings)>
-		</cfif>
-		<cfreturn result.parser>
+		<cfreturn createObject("component", "ebxParser").init(this, arguments.attributes, arguments.scopecopy, arguments.nosettings, arguments.nolayout)>
 	</cffunction>
 	
 	<cffunction name="hasCircuit">

@@ -12,23 +12,36 @@
 		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="OnBoxInit" hint="Initialize eBox">
-		<cfargument name="attributes"     required="false" type="struct"  default="#StructNew()#" hint="default attributes">
-		<cfargument name="scopecopy"      required="false" type="string"  default="url,form" hint="list of scopes to copy to attributes">
-		<cfargument name="parse_settings" required="false" type="boolean" default="true"     hint="parse settingsfile?">
+	<cffunction name="OnBoxInit" hint="Initialise Parser">
+		<cfset var local = StructNew()>
 		
-		<cfset var result = StructNew()>
-		<cfset result.attr = variables.pi.getAttributes(arguments.attributes)>
-		<cfloop list="#arguments.scopecopy#" index="result.item">
-			<cfset StructAppend(result.attr, variables.pi.getAttribute(result.item, StructNew()))>
+		<cfset local.attr   = variables.pi.getAttributes()>
+		<cfset local.scopes = variables.pi.getProperty("scopecopy")>
+		<cfloop list="#local.scopes#" index="local.scope">
+			<cfset StructAppend(local.attr, variables.pi.getVar(local.scope, StructNew()))>
 		</cfloop>
-		<cfset variables.pi.setAttributes(result.attr)>
-		
-		<!--- <cfif arguments.parse_settings>
-			<cfset result.settings = variables.parser.include(variables.parser.getParameter("settingsfile"))>
-		</cfif> --->
+		<cfset variables.pi.setAttributes(local.attr)>
+				
+		<cfif variables.pi.parseSettings()>
+			<cfif variables.pi.createInclude(variables.pi.getSettingsFile())>
+				<cfset variables.pi.executeContext()>
+				<cfset variables.pi.finaliseExecution()>
+			</cfif>
+		</cfif>
 		
 		<cfreturn true>		
+	</cffunction>
+	
+	<cffunction name="OnCreateContext" hint="creates a context for an execution">
+		<cfset var si = variables.pi.getStackInterface()>
+		<cfreturn >
+	</cffunction>
+	
+	<cffunction name="OnExecuteContext" hint="creates a context for an execution">
+		<cfset var si = variables.pi.getStackInterface()>
+		<cfset var ctx = si.get()>
+		
+		<cfreturn si.get()>
 	</cffunction>
 	
 	<cffunction name="OnAddRequest" hint="Call on application init">
@@ -52,11 +65,8 @@
 	</cffunction>
 	
 	<cffunction name="OnCreateRequest" hint="get all messages from debugsink">
-		<cfargument name="action"     required="true"  type="string" hint="full qualified action">
-		<cfargument name="parameters" required="false" type="struct"  hint="custom attributes for the fuseaction">
 		
-		<cfset var hi = variables.pi.getHandlerInterface()>
-		<cfif NOT hi.maxRequestsReached()>
+		<cfif NOT variables.pi.maxRequestsReached()>
 			<cfset variables.pi.setLastRequest(hi.createRequest(arguments.action, arguments.parameters))>
 			<cfreturn true>
 		</cfif>

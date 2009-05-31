@@ -30,10 +30,23 @@
 	<cfset this.postPlugins         = ArrayNew(1)>
 	
 	<cffunction name="init">
-		<cfargument name="ebx" type="ebx" required="true">
+		<cfargument name="ebx"        required="true"  type="ebx" hint="eBox instance">
+		<cfargument name="attributes" required="false" type="struct"  default="#StructNew()#" hint="attributes to use in the parser">
+		<cfargument name="scopecopy"  required="false" type="string"  default="url,form"      hint="list of scopes to copy to attributes">
+		<cfargument name="nosettings" required="false" type="boolean" default="false"         hint="do not parse settingsfile">
+		<cfargument name="nolayout"   required="false" type="boolean" default="false"         hint="do not parse layout">
+		
 			<cfset var local = StructNew()>
 			<cfset variables.ebx = arguments.ebx>
+			
 			<cfset variables.pi  = createObject("component", "ebxParserInterface").init(this)>
+			<cfset variables.pi.setAttributes(arguments.attributes)>
+			
+			<cfset setProperty("scopecopy", arguments.scopecopy, true)>
+			<cfset setProperty("nosettings", arguments.nosettings, true)>
+			<cfset setProperty("nolayout", arguments.nolayout, true)>
+			<cfset setProperty("stack", variables.pi.getStackInterface(), true)>
+			
 		<cfreturn this>
 	</cffunction>
 	
@@ -46,8 +59,13 @@
 	</cffunction>
 
 	<cffunction name="execute">
-		<cfargument name="parselayoutsfile"  required="false" type="boolean" default="true" hint="parse layoutsfile?">
-		<cfreturn variables.pi.executeMainRequest(arguments)>
+		<!--- <cfargument name="attributes" required="false" type="struct"  default="#getProperty('attributes', StructNew())#" hint="attributes to use in the parser">
+		<cfargument name="scopecopy"  required="false" type="string"  default="#getProperty('scopecopy', 'url,form')#"   hint="list of scopes to copy to attributes">
+		<cfargument name="nosettings" required="false" type="boolean" default="#getProperty('nosettings', false)#"       hint="do not parse settingsfile">
+		<cfargument name="nolayout"   required="false" type="boolean" default="#getProperty('nolayout', false)#"         hint="do not parse layout">
+		
+		<cfset setProperties(arguments)> --->
+		<cfreturn variables.pi.executeMainRequest()>
 	</cffunction>
 	
 	<cffunction name="getEbx">
@@ -65,11 +83,7 @@
 	</cffunction>
 	
 	<cffunction name="initialise">
-		<cfargument name="attributes"     required="false" type="struct"  default="#StructNew()#" hint="default attributes">
-		<cfargument name="scopecopy"      required="false" type="string"  default="url,form" hint="list of scopes to copy to attributes">
-		<cfargument name="parse_settings" required="false" type="boolean" default="true"     hint="parse settingsfile?">
-		
-		<cfreturn variables.pi.executeInitialise(arguments)>
+		<cfset variables.pi.executeInitialise()>
 		<cfreturn this>
 	</cffunction>
 	

@@ -1,37 +1,19 @@
 <cfswitch expression="#request.ebx.act#">
-	<cfcase value="test">
-		<cfparam name="attributes.x" default="some value">
-		<cfoutput><hr />x is now: #attributes.x#</cfoutput>
-		asss
-		<cfdump var="#request.ebx#">
+	<cfcase value="box">
+		<cfparam name="attributes.title"  default="">
+		<cfparam name="attributes.content" default="">
+		<cfset request.ebx.include("inc_box.cfm")>
 	</cfcase>
 	
-	<cfcase value="test2">
-		<cfoutput>I was caught: #attributes.abc#</cfoutput>
+	<cfcase value="loginform">
+		<cfset login.title  = "Login">
+		<cfset request.ebx.include(template="dsp_loginform.cfm", contentvar="login.content")>
+		<cfset request.ebx.do(action="home.box", params=login)>
 	</cfcase>
 	
 	<cfdefaultcase>
-		asdcvv - <!--- <p><cfoutput>#self#</cfoutput></p> --->
-	<!--- 	 --->
-		<cfoutput>#y#</cfoutput>
-		<cfset mycontent = "hello">
-		
-		<cfset attributes.abc = "123">
-		
-		<cfset myCustomAttr = StructNew()>
-		<cfset myCustomAttr.abc = "4560">
-		<cfset myCustomAttr.x = "4560">
-		
-		<cfset aVar = "abcdef">
-		<cfoutput>#aVar#</cfoutput>
-		<cfset request.ebx.do(action="home.test2", params=myCustomAttr)>
-		<cfset myCustomAttr.abc = "5860">
-		<cfset request.ebx.include(template="dsp_incl.cfm", params=myCustomAttr, contentvar="aVar", append="true")>
-		<cfoutput>#aVar#</cfoutput>
-		<cfset request.ebx.do(action="home.test", params=myCustomAttr, contentvar="aVar")>
-		<!--- <p>testing</p>
-		<cfoutput>#mycontent#</cfoutput> --->
-		
-		<cfoutput>#aVar#</cfoutput>
+		<cfset request.ebx.do(action="home.loginform", contentvar="content.loginbox")>
+		<cfset request.ebx.include(template="inc_hometekst.cfm", contentvar="content.home")>
+		<cfset request.ebx.include("dsp_tonen.cfm")>
 	</cfdefaultcase>
 </cfswitch>

@@ -9,7 +9,7 @@
 	<cfset variables.execDir    = "">
 	
 	<cfset variables.output      = "">
-	<cfset variables.parameters  = StructNew()>
+	<cfset variables.attributes  = StructNew()>
 	
 	<cfset variables.executable  = false>
 	
@@ -18,10 +18,10 @@
 	<cffunction name="init">
 		<cfargument name="ParserInterface" required="true" type="ebxParserInterface">
 		<cfargument name="action"     required="true" type="string">
-		<cfargument name="parameters" required="false" type="struct" default="#StructNew()#">
+		<cfargument name="attributes" required="false" type="struct" default="#StructNew()#">
 			<cfset variables.pi = arguments.ParserInterface>
 			<cfset parseAction(arguments.action)>
-			<cfset setParameters(arguments.parameters)>
+			<cfset setAttributes(arguments.attributes)>
 		<cfreturn this>
 	</cffunction>	
 	
@@ -40,6 +40,10 @@
 	<cffunction name="getAction">
 		<cfreturn variables.fullact>
 	</cffunction>
+	
+	<cffunction name="getAttributes">
+		<cfreturn variables.parameters>
+	</cffunction>
 
 	<cffunction name="getCircuit">
 		<cfreturn variables.circuit>
@@ -55,10 +59,6 @@
 	
 	<cffunction name="getOutput">
 		<cfreturn variables.output>
-	</cffunction>
-	
-	<cffunction name="getParameters">
-		<cfreturn variables.parameters>
 	</cffunction>
 	
 	<cffunction name="getRootPath">
@@ -122,9 +122,9 @@
 		<cfset variables.output = arguments.output>
 	</cffunction>
 	
-	<cffunction name="setParameters">
-		<cfargument name="params" type="struct" required="false" default="#StructNew()#">
-		<cfset variables.parameters = arguments.params>
+	<cffunction name="setAttributes">
+		<cfargument name="attributes" type="struct" required="false" default="#StructNew()#">
+		<cfset variables.attributes = arguments.attributes>
 	</cffunction>
 
 	<cffunction name="_dump">

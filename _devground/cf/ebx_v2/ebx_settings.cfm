@@ -1,5 +1,6 @@
 <cfset self = "index.cfm">
-<cfset y = "dfhask">
+<cfset request.ebx.y = "dfhask">
+<cfset y = "i am y">
 
-<!--- <cfoutput>#self#</cfoutput> --->
+<!-- <cfoutput>#self#</cfoutput> -->
 

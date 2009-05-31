@@ -48,20 +48,33 @@
 		<cfargument name="targetlist" type="string" required="true">
 		
 		<cfset var local = StructNew()>
-		<cfset local.target = listToArray(arguments.targetlist)>
-		<cfset local.source = listToArray(arguments.sourcelist)>
-		<cfset local.target.retainAll(local.source)>
-		
-		<cfreturn ArrayToList(local.target)>
+		<cfif arguments.targetlist neq "">
+			<cfset local.target = ArrayNew(1)>
+			<cfloop list="#arguments.targetlist#" index="local.item">
+				<cfif ListFind(arguments.sourcelist, local.item)>
+					<cfset ArrayAppend(local.target, local.item)>
+				</cfif>
+			</cfloop>
+			<!--- retainAll does not seem to work arrggh!
+			<cfset local.target = listToArray(arguments.targetlist)>
+			<cfset local.source = listToArray(arguments.sourcelist)>
+			<cfset local.target.retainAll(local.source)>
+			 --->
+			<cfreturn ArrayToList(local.target)>
+		<cfelse>
+			<cfreturn arguments.sourcelist>
+		</cfif>
 	</cffunction>
 	
 	<cffunction name="setFromList" access="private">
 		<cfargument name="list" required="true" type="string" hint="list data">
 		<cfargument name="force"  required="false" type="boolean" default="false" hint="force setting property">
 		<cfargument name="overwrite" required="false" type="boolean" default="true" hint="overwrite property">
+		<cfargument name="keylist"   required="false" type="string"  default=""      hint="only properties from the list of keys">
 		
 		<cfset var local = StructNew()>
-		<cfloop list="#arguments.list#" index="local.key">
+		<cfset local.list = retainList(arguments.list, arguments.keylist)>
+		<cfloop list="#local.list#" index="local.key">
 			<cfset setProperty(local.key, "", arguments.force, arguments.overwrite)>
 		</cfloop>
 		
@@ -73,9 +86,11 @@
 		<cfargument name="recidx" required="false" type="numeric" default="1" hint="the record index used if objectdata is queryable">
 		<cfargument name="force"  required="false" type="boolean" default="false" hint="force setting property">
 		<cfargument name="overwrite" required="false" type="boolean" default="true" hint="overwrite property">
+		<cfargument name="keylist"   required="false" type="string"  default=""      hint="only properties from the list of keys">
 			
 		<cfset var local = StructNew()>
-		<cfloop list="#arguments.record.columnlist#" index="local.column">
+		<cfset local.list = retainList(arguments.record.columnlist, arguments.keylist)>
+		<cfloop list="#local.list#" index="local.column">
 			<cfset local.value = "">
 			<cfif arguments.record.recordcount GTE arguments.recidx>
 				<cfset local.value = arguments.record[local.column][arguments.recidx]>
@@ -87,12 +102,14 @@
 	</cffunction>
 	
 	<cffunction name="setFromStruct" access="private">
-		<cfargument name="object" required="true" type="struct" hint="struct data">
-		<cfargument name="force" required="false" type="boolean" default="false" hint="force setting property">
-		<cfargument name="overwrite" required="false" type="boolean" default="true" hint="overwrite property">
+		<cfargument name="object"    required="true"  type="struct"  hint="struct data">
+		<cfargument name="force"     required="false" type="boolean" default="false" hint="force setting property">
+		<cfargument name="overwrite" required="false" type="boolean" default="true"  hint="overwrite property">
+		<cfargument name="keylist"   required="false" type="string"  default=""      hint="only properties from the list of keys">
 	
 		<cfset var local = StructNew()>
-		<cfloop collection="#arguments.object#" item="local.key">
+		<cfset local.list = retainList(StructKeyList(arguments.object), arguments.keylist)>
+		<cfloop list="#local.list#" index="local.key">
 			<cfset setProperty(local.key, arguments.object[local.key], arguments.force, arguments.overwrite)>
 		</cfloop>
 		
@@ -116,18 +133,20 @@
 	</cffunction>
 	
 	<cffunction name="setProperties" access="private" hint="set properties from a data object">
-		<cfargument name="data"   required="true"  type="any"     hint="the object that holds the data">
-		<cfargument name="force"  required="false" type="boolean" default="false" hint="force setting property">
-		<cfargument name="overwrite"  required="false" type="boolean" default="true" hint="overwrite property">
-		<cfargument name="recidx" required="false" type="numeric" default="1" hint="the record index used if objectdata is queryable">
+		<cfargument name="data"      required="true"  type="any"     hint="the object that holds the data">
+		<cfargument name="force"     required="false" type="boolean" default="false" hint="force setting property">
+		<cfargument name="overwrite" required="false" type="boolean" default="true"  hint="overwrite property">
+		<cfargument name="recidx"    required="false" type="numeric" default="1"     hint="the record index used if objectdata is queryable">
+		<cfargument name="keylist"   required="false" type="string"  default=""      hint="only properties from the list of keys">
 		
 		<cfset var local = StructNew()>
+		
 		<cfif IsQuery(arguments.data)>
-			<cfset setFromRecord(arguments.data, arguments.recidx, arguments.force, arguments.overwrite)>
+			<cfset setFromRecord(arguments.data, arguments.recidx, arguments.force, arguments.overwrite, arguments.keylist)>
 		<cfelseif IsStruct(arguments.data)>
-			<cfset setFromStruct(arguments.data, arguments.force, arguments.overwrite)>
+			<cfset setFromStruct(arguments.data, arguments.force, arguments.overwrite, arguments.keylist)>
 		<cfelseif ListLen(arguments.data)>
-			<cfset setFromList(arguments.data, arguments.force, arguments.overwrite)>
+			<cfset setFromList(arguments.data, arguments.force, arguments.overwrite, arguments.keylist)>
 		</cfif>
 		
 		<cfreturn true>
