@@ -1,186 +1,112 @@
 <cfcomponent>
-	<cfset variables.ebx            = "">
-	<cfset variables.Parser         = "">
-	<cfset variables.CurrentContext = "">
-	
-	<cfset variables.interfaces  = StructNew()>
-	
+	<cfset variables.ebx          = "">
+	<cfset variables.Parser       = "">
+	<cfset variables.thisContext  = "">
+
 	<cffunction name="init" returntype="ebxParserInterface">
-		<cfargument name="ebxParser" type="ebxParser" required="true">
+		<cfargument name="ebxParser"  type="ebxParser" required="true">
+		<cfargument name="attributes" type="struct"    required="false" default="#StructNew()#">
 		
 		<cfset variables.Parser = arguments.ebxParser>
 		<cfset variables.ebx    = variables.Parser.getEbx()>
 		
-		<cfset createEventInterface()>
-		<cfset createStackInterface()>
-		<cfset createPageContext()>
+		<cfset variables.pc    = createObject("component", "ebxPageContext")>
+		<cfset variables.stack = createObject("component", "ebxExecutionStack").init(createContext("empty"))>
+		<cfset variables.evt   = createObject("component", "ebxEvents").init(this)>
+		
+		<cfset setAttributes(arguments.attributes)>
 		
 		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="assignOutput" hint="assign output (mostly from an executioncontext result) to content var or else flush it to the page">
-		<cfargument name="output"     required="true" type="string" default="false" hint="wheater to append contentvars output">
-		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
-		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
-		
-		<cfset var pc = getEbxPageContext()>
-		<cfset var out = arguments.output>
-		
-		<cfif arguments.contentvar eq "">
-			<cfset pc.ebx_write(out)>
-		<cfelse>
-			<cfif arguments.append>
-				<cfset out = getVar(arguments.contentvar) & out>
-			</cfif>
-			<cfset pc.ebx_put(arguments.contentvar, out)>
-		</cfif>
-		<cfreturn true>
+	<cffunction name="appendStack" returntype="any">
+		<cfreturn variables.stack.add(variables.thisContext)>
 	</cffunction>
 	
-	<cffunction name="createContext" returntype="boolean" hint="create a executioncontext and on success set the default arguments">
-		<cfargument name="attributes" required="false"  type="struct" default="#StructNew()#"  hint="the action to execute">
-		<cfargument name="contentvar" required="false"  type="string" default=""  hint="the action to execute">
-		<cfargument name="append"     required="false"  type="boolean" default="false"  hint="the action to execute">
-		
-		<cfif createExecutionContext()>
-			<cfset variables.CurrentContext.setAttributes(arguments.attributes)>
-			<cfset variables.CurrentContext.setContentVar(arguments.contentvar)>
-			<cfset variables.CurrentContext.setAppend(arguments.append)>
-			<cfreturn true>
-		</cfif>
-		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="createEventInterface" returntype="boolean" hint="create the eventinterface">
-		<cfreturn createInterface("ebxEvents", true)>
-	</cffunction>
-	
-	<cffunction name="createExecutionContext" returntype="boolean" hint="create a new empty context in the stack and set it to the current">
-		<cfif NOT maxRequestsReached()>
-			<cfset getStackInterface().add(createObject("component", "ebxExecutionContext").init(this))>
-			<cfset setCurrentContext()>
-			<cfreturn true>
-		</cfif>
-		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="createInclude" returntype="boolean" hint="create a executioncontext for an include">
-		<cfargument name="template"     required="true"  type="string"   hint="the action to execute">
-		<cfargument name="attributes" required="false"  type="struct" default="#StructNew()#"  hint="the action to execute">
-		<cfargument name="contentvar" required="false"  type="string" default=""  hint="the action to execute">
-		<cfargument name="append"     required="false"  type="boolean" default="false"  hint="the action to execute">
-		
-		<cfif createContext(arguments.attributes, arguments.contentvar, arguments.append)>
-			<cfset variables.CurrentContext.setTemplate(getFilePath(arguments.template))>
-			<cfreturn true>
-		</cfif>
-		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="createInterface" returntype="boolean" hint="create a interface">
-		<cfargument name="name" type="any"     required="true">
-		<cfargument name="init" type="boolean" required="false" default="true">
-		
-		<cfif NOT StructKeyExists(variables.interfaces, arguments.name)>
-			<cfset StructInsert(variables.interfaces, arguments.name, createObject("component", arguments.name))>
-			<cfif arguments.init>
-				<cfset getInterface(arguments.name).init(this)>
-			</cfif>
-			<cfreturn true>
-		</cfif>
-		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="createPageContext" returntype="boolean" hint="create the pagecontext">
-		<cfreturn createInterface("ebxPageContext", false)>
-	</cffunction>
-	
-	<cffunction name="createRequest" returntype="boolean"  hint="create a executioncontext for a request">
-		<cfargument name="action"     required="true"  type="string"   hint="the action to execute">
-		<cfargument name="attributes" required="false"  type="struct" default="#StructNew()#"  hint="the action to execute">
-		<cfargument name="contentvar" required="false"  type="string" default=""  hint="the action to execute">
-		<cfargument name="append"     required="false"  type="boolean" default="false"  hint="the action to execute">
+	<cffunction name="assignVariable" hint="assign output (mostly from an executioncontext result) to content var or else flush it to the page">
+		<cfargument name="contentvar" required="true" type="string" hint="pagevariable to set">
+		<cfargument name="value"        required="true" type="any"  hint="value to use">
+		<cfargument name="append"       required="false" type="boolean" default="false" hint="wheater to append contentvars output">
 		
 		<cfset var local = StructNew()>
-		
-		<cfif createContext(arguments.attributes, arguments.contentvar, arguments.append)>
-			<cfset variables.CurrentContext.setAction(arguments.action)>
-			<cfreturn true>
-		</cfif>
-		
-		<cfreturn false>
-	</cffunction>
-		
-	
-	<cffunction name="createStackInterface" returntype="boolean" hint="create the stackinterface">
-		<cfreturn createInterface("ebxExecutionStack", false)>
-	</cffunction>
-	
-	<cffunction name="executeContext" returntype="boolean" hint="execute the context by including the (switch)file and assign its result variable. sets custom attributes and restores them afterwards.">
-		<cfset updateAttributes(variables.CurrentContext.getAttributes())>
-		<cfset variables.CurrentContext.execute()>
-		<cfset updateAttributes(variables.CurrentContext.getOriginals())>
-		<cfreturn true>
-	</cffunction>
-	
-	<cffunction name="executeDo" returntype="boolean" hint="create and execute a subrequest. may assign its output to custom appendable variable">
-		<cfargument name="action"     required="true" type="string"   hint="the action to execute">
-		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
-		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
-		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
-		
-		<cfif createRequest(arguments.action, arguments.params, arguments.contentvar, arguments.append)>
-			<cfif variables.CurrentContext.isExecutable()>
-				<cfset updateParser(variables.CurrentContext.getRequest())>
-				<cfset variables.CurrentContext.setTemplate(getSwitchFile())>
-				<cfset executeContext()>
+		<cfif arguments.append>
+			<cfset local.currval = getVar(arguments.contentvar)>
+			<cfif IsSimpleValue(local.currval) AND local.currval eq "">
+				<!--- bail out immediately if append isn't needed --->
+				<cfset local.currval = arguments.value>
+			<cfelseif IsSimpleValue(local.currval) AND IsSimpleValue(arguments.value)>
+				<!--- string concatenation if both are string --->
+				<cfset local.currval = local.currval & 	arguments.value>
+			<cfelseif IsArray(local.currval)>
+				<!--- ArrayAppend on array --->
+				<!--- TODO: 
+						Add [[AND NOT IsArray(arguments.value)]] so that we can concat both arrays; 
+						But is this actually nice behaviour? 
+				--->
+				<cfset ArrayAppend(local.currval, arguments.value)>
+			<cfelseif IsStruct(local.currval) AND IsStruct(arguments.value)>
+				<!--- Merge structs if both are structs --->
+				<cfset StructAppend(local.currval, arguments.value, true)>
+			<cfelseif IsQuery(local.currval) AND IsStruct(arguments.value)>
+				<!--- Add query row based on struct; this is a bit experimental --->
+				<cfset local.cols  = local.currval.columnlist>
+				<cfset local.recs  = local.currval.recordcount>
+				<cfset local.valid = false>
+				<cfset QueryAddRow(local.currval)>
+				
+				<cfloop list="#StructKeyList(arguments.value)#" index="local.item">
+					<cfset local.testval = arguments.value[local.item]>
+					<cfif ListFind(local.cols, local.item)>
+						<cfset QuerySetCell(local.currval, local.item, local.testval)>
+						<cfset local.valid = true>
+					<cfelseif IsArray(local.testval) AND ArrayLen(local.testval) eq local.recs>
+						<cfset QueryAddColumn(local.currval, local.item, local.testval)>
+						<cfset local.valid = true>
+					</cfif>
+				</cfloop>
+				<cfif NOT local.valid>
+					<cfset local.currval.removeRows(JavaCast( "int", local.recs ),JavaCast( "int", 1 ))>
+				</cfif>
 			</cfif>
-			<cfset finaliseExecution()>
-			<cfset updateParser(variables.CurrentContext.getRequest())>
-			<cfreturn true>
+		<cfelse>
+			<cfset local.currval = arguments.value>
 		</cfif>
 		
-		<cfreturn false>
-	</cffunction>
-	
-	<cffunction name="executeInclude" returntype="boolean" hint="include a template with custom attributes. may assign its output to custom appendable variable">
-		<cfargument name="template"   required="true" type="string"   hint="the action to execute">
-		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
-		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
-		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
+		<cfset getEbxPageContext().ebx_put(arguments.contentvar, local.currval)>
 		
-		<cfif createInclude(arguments.template, arguments.params, arguments.contentvar, arguments.append)>
-			<cfset executeContext()>
-			<cfset finaliseExecution()>
-		</cfif>
 		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="executeInitialise" returntype="boolean" hint="initialise parser / parse settings / convert formurl scopes to attributes">
-		<cfset var evt = getEventInterface()>
-		<cfreturn evt.OnBoxInit()>
+	<cffunction name="contextIsExecutable">
+		<cfreturn variables.thisContext.isExecutable()>
 	</cffunction>
 	
-	<cffunction name="executeMainRequest" returntype="boolean" hint="create the original request">
-		<cfif createRequest(getMainAction())>
-			<cfset updateParser(variables.CurrentContext.getRequest())>
-			<cfset variables.Parser.setOriginalRequest(variables.CurrentContext.getRequest())>
-			<cfset variables.CurrentContext.setTemplate(getSwitchFile())>
-			<cfset executeContext()>
-			<cfset assignOutput(variables.CurrentContext.getOutput())>
-		</cfif>
-	
-		<cfreturn false>		
+	<cffunction name="createContext"  returntype="ebxExecutionContext" hint="create a executioncontext and on success set the default arguments">
+		<cfargument name="type"       required="true"   type="string"  hint="the contexttype (request|include|mainrequest|empty)">
+		<cfargument name="attributes" required="false"  type="struct"  default="#StructNew()#" hint="custom attributes">
+		<cfargument name="contentvar" required="false"  type="string"  default=""              hint="variable to use for output">
+		<cfargument name="append"     required="false"  type="boolean" default="false"         hint="append the contentvar">
+		<cfargument name="template"   required="false"  type="string"  default=""              hint="full mapping-path to template">
+		<cfargument name="action"     required="false"  type="string"  default=""              hint="action">
+		<cfargument name="parse"      required="false"  type="boolean" default="true"          hint="depending on type, parse action or result for an template immediately">
+		
+		<cfset var local = StructNew()>
+		<cfset local.thisContext = createObject("component", "ebxExecutionContext").init(this, arguments.type)>
+		<cfset local.thisContext.setAttributes(arguments.attributes)>
+		<cfset local.thisContext.setContentVar(arguments.contentvar)>
+		<cfset local.thisContext.setAppend(arguments.append)>
+		<cfset local.thisContext.setTemplate(arguments.template)>
+		<cfset local.thisContext.setAction(arguments.action, arguments.parse)>
+		
+		<cfreturn local.thisContext>
 	</cffunction>
 	
-	<cffunction name="finaliseExecution" returntype="boolean" hint="assign contextresult output, cleanup from stack">
-		<cfset assignOutput(variables.CurrentContext.getOutput(), variables.CurrentContext.getContentVar(), variables.CurrentContext.getAppend())>
-		<cfset getStackInterface().remove()>
-		<cfif getStackInterface().getLength()>
-			<cfset setCurrentContext()>
-		</cfif>
+	<cffunction name="flushOutput" returntype="boolean">
+		<cfargument name="output" type="string" required="true">
+		<cfset getEbxPageContext().ebx_write(arguments.output)>
+		<cfreturn true>
 	</cffunction>
-
+	
 	<cffunction name="getAppPath">
 		<cfreturn variables.ebx.getAppPath()>
 	</cffunction>
@@ -207,16 +133,68 @@
 		<cfreturn variables.ebx.getCircuitDir(arguments.name)>
 	</cffunction>
 	
+	<cffunction name="getContextAction" returntype="any">
+		<cfreturn variables.thisContext.getAction()>
+	</cffunction>
+	
+	<cffunction name="getContextAppend" returntype="any">
+		<cfreturn variables.thisContext.getAppend()>
+	</cffunction>
+	
+	<cffunction name="getContextAttributes">
+		<cfreturn variables.thisContext.getAttributes()>
+	</cffunction>
+
+	<cffunction name="getContextCaught">
+		<cfreturn  variables.thisContext.getCaught()>
+	</cffunction>
+	
+	<cffunction name="getContextErrors">
+		<cfreturn  variables.thisContext.getErrors()>
+	</cffunction>
+	
+	<cffunction name="getContextOriginals">
+		<cfreturn variables.thisContext.getOriginals()>
+	</cffunction>
+	
+	<cffunction name="getContextOutput" returntype="any">
+		<cfreturn variables.thisContext.getOutput()>
+	</cffunction>
+	
+	<cffunction name="getContextRequest" returntype="any">
+		<cfreturn variables.thisContext.getRequest()>
+	</cffunction>
+
+	<cffunction name="getContextResult">
+		<cfreturn  variables.thisContext.getResult()>
+	</cffunction>
+	
+	<cffunction name="getContextTemplate" returntype="any">
+		<cfreturn variables.thisContext.getTemplate()>
+	</cffunction>
+	
+	<cffunction name="getContextType" returntype="any">
+		<cfreturn variables.thisContext.getType()>
+	</cffunction>
+	
+	<cffunction name="getContextVar" returntype="any">
+		<cfreturn variables.thisContext.getContentVar()>
+	</cffunction>
+	
 	<cffunction name="getCurrentContext" returntype="ebxExecutionContext">
-		<cfreturn variables.CurrentContext>
+		<cfreturn variables.thisContext>
 	</cffunction>
 	
 	<cffunction name="getEbxPageContext" returntype="ebxPageContext">
-		<cfreturn getInterface("ebxPageContext")>
+		<cfreturn variables.pc>
+	</cffunction>
+	
+	<cffunction name="getEmptyContext" returntype="ebxExecutionContext">
+		<cfreturn variables.emptyContext>
 	</cffunction>
 	
 	<cffunction name="getEventInterface" returntype="ebxEvents">
-		<cfreturn getInterface("ebxEvents")>
+		<cfreturn variables.evt>
 	</cffunction>
 	
 	<cffunction name="getFilePath">
@@ -228,25 +206,16 @@
 			<cfset arguments.name = variables.Parser.getProperty("circuitdir") & arguments.name>
 		</cfif>
 		<cfif arguments.parseAppPath>
-			<cfset arguments.name = variables.Parser.getProperty("appath") & arguments.name>
+			<cfset arguments.name = getAppPath() & arguments.name>
 		</cfif>
 		<cfreturn arguments.name>
-	</cffunction>
-	
-	<cffunction name="getInterface" returntype="any">
-		<cfargument name="name" type="any" required="true">
-		
-		<cfif StructKeyExists(variables.interfaces, arguments.name)>
-			<cfreturn variables.interfaces[arguments.name]>
-		</cfif>
-		<cfreturn "">
 	</cffunction>
 	
 	<cffunction name="getLayout">
 		<cfreturn getFilePath(variables.Parser.getProperty("layoutdir") & variables.Parser.getProperty("layoutfile"), true, false)>
 	</cffunction>
 	
-	<cffunction name="getLayoutFile">
+	<cffunction name="getLayoutsFile">
 		<cfreturn getFilePath(getParameter("layoutsfile"), true, false)>
 	</cffunction>
 	
@@ -273,15 +242,14 @@
 		<cfreturn getFilePath(getParameter("settingsfile"))>
 	</cffunction>
 	
+	<cffunction name="getStackInterface" returntype="ebxExecutionStack">
+		<cfreturn variables.stack>
+	</cffunction>
+	
 	<cffunction name="getSwitchFile">
 		<cfreturn getFilePath(getParameter("switchfile"))>
 	</cffunction>
-	
-	
-	<cffunction name="getStackInterface" returntype="ebxExecutionStack">
-		<cfreturn getInterface("ebxExecutionStack")>
-	</cffunction>
-	
+		
 	<cffunction name="getVar" returntype="any">
 		<cfargument name="name"  type="string" required="true">
 		<cfargument name="value" type="any"    required="false" default="">
@@ -294,64 +262,64 @@
 		
 		<cfreturn StructKeyExists(arguments.attributes, arguments.name)>
 	</cffunction>
+
+	<cffunction name="hasContextErrors">
+		<cfreturn  variables.thisContext.hasErrors()>
+	</cffunction>
 	
 	<cffunction name="hasCircuit">
 		<cfargument name="name" type="string" required="true">
 		<cfreturn variables.ebx.hasCircuit(arguments.name)>
 	</cffunction>
-	
+
 	<cffunction name="include" returntype="struct">
 		<cfargument name="template"      type="string" required="true">
 		<cfreturn getEbxPageContext().ebx_include(arguments.template)>
 	</cffunction>
 	
+	<cffunction name="isContextInclude">
+		<cfreturn variables.thisContext.isInclude()>
+	</cffunction>
+	
+	<cffunction name="isContextRequest">
+		<cfreturn variables.thisContext.isRequest()>
+	</cffunction>
+
+	<cffunction name="isMainContextRequest">
+		<cfreturn variables.thisContext.isMainRequest()>
+	</cffunction>
 	
 	<cffunction name="maxRequestsReached" returntype="boolean">
 		<cfreturn getStackInterface().maxReached()>
 	</cffunction>
 	
-	<cffunction name="setCurrentContext" returntype="ebxExecutionContext">
-		<cfset variables.CurrentContext = getStackInterface().get()>
-		<cfreturn getCurrentContext()>
-	</cffunction>
-	
-	<cffunction name="releaseAttributes" returntype="boolean">
-		<cfset var local = StructNew()>
-		<cfif ArrayLen(variables.CustomAttr)>
-			<cfset updateAttributes(variables.CustomAttr[1])>
-			<cfset ArrayDeleteAt(variables.CustomAttr,1)>
-			<cfreturn true>
-		</cfif>
-		<cfreturn false>
-	</cffunction>
-	
-	
-	
-	<cffunction name="storeAttributes" returntype="boolean">
-		<cfargument name="attributes" type="struct" required="false" default="#StructNew()#">
-		<cfset ArrayPrepend(variables.CustomAttr, arguments.attributes)>
-		<cfreturn true>
-	</cffunction>
-	
-	
-	
-	
-	<cffunction name="updateParser" returntype="boolean">
-		<cfargument name="request" type="ebxRequest" required="true">
-		
-		<cfset variables.Parser.setCurrentRequest(arguments.request)>
-		<cfset variables.Parser.setTargetRequest(arguments.request)>
-		
-		<cfreturn true>
-	</cffunction>
-	
-	<cffunction name="parseSettings" returntype="boolean">
-		<cfreturn NOT variables.Parser.getProperty("nosettings")>
+	<cffunction name="parseLayout" returntype="boolean">
+		<cfreturn NOT variables.Parser.getProperty("nolayout")>
 	</cffunction>
 	
 	<cffunction name="setAttributes" returntype="any">
 		<cfargument name="attribs" type="struct" required="true">
 		<cfreturn getEbxPageContext().ebx_put("attributes", arguments.attribs)>
+	</cffunction>
+	
+	<cffunction name="setContextTemplate" returntype="any">
+		<cfargument name="template" type="string" required="true">
+		<cfreturn variables.thisContext.setTemplate(arguments.template)>
+	</cffunction>
+	
+	<cffunction name="setEmptyContext" returntype="boolean">
+		<cfreturn setThisContext(getEmptyContext())>
+	</cffunction>
+	
+	<cffunction name="setLayout" returntype="boolean">
+		<cfargument name="layout" type="string" required="true">
+		<cfreturn variables.Parser.setLayout(arguments.layout)>
+	</cffunction>
+	
+	<cffunction name="setThisContext" returntype="boolean">
+		<cfargument name="context" type="ebxExecutionContext" required="true">
+		<cfset variables.thisContext = arguments.context>
+		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="updateAttributes" returntype="any">
@@ -361,5 +329,29 @@
 		<cfset local.attr = getAttributes()>
 		<cfset StructAppend(local.attr, arguments.attributes, TRUE)>
 		<cfreturn setAttributes(local.attr)>
+	</cffunction>	
+	
+	<cffunction name="updateContext" returntype="boolean">
+		<cfset setThisContext(variables.stack.getCurrent())>
+		<cfreturn true>
 	</cffunction>
+				
+	<cffunction name="updateParser" returntype="boolean">
+		<cfif isContextRequest()>
+			<cfset variables.Parser.setCurrentRequest(getContextRequest())>
+			<cfset variables.Parser.setTargetRequest(getContextRequest())>
+			<cfif isMainContextRequest()>
+				<cfset variables.Parser.setOriginalRequest(getContextRequest())>
+			</cfif>
+		</cfif>
+		<cfreturn true>
+	</cffunction>
+	
+	<cffunction name="updateStack" returntype="any">
+		<cfset variables.stack.remove()>
+		<cfset updateContext()>
+		<cfset updateParser()>
+		<cfreturn true>
+	</cffunction>
+	
 </cfcomponent>

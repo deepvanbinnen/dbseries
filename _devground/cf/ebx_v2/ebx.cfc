@@ -22,7 +22,6 @@
 		<cfargument name="debuglevel"   required="false" type="numeric" default="0" hint="error level for debugmessages">
 		
 			<cfset setParameters(arguments, true)>
-			<cfset this.state = "initialised">
 			<!--- If you have an 'old' version of ebx, you should call setup from the requesting page 
 			to finalise the setup --->
 		<cfreturn this>
@@ -100,8 +99,10 @@
 	<cffunction name="setParameters">
 		<cfargument name="parameters" required="true">
 		<cfargument name="overwrite"  required="true" default="false">
+		
 		<cfset variables.parameters.setParameters(arguments.parameters, arguments.overwrite)>
 		<cfset setProperties(arguments.parameters, true, arguments.overwrite)>
+		
 	</cffunction>
 	
 	<cffunction name="setup">

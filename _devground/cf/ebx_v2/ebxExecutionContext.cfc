@@ -1,12 +1,4 @@
 <cfcomponent hint="I represent the parameters for an execution context">
-	<!--- 
-	= OnceAndOnlyOnce =
-	
-	"One of the main goals (if not the main goal) when ReFactoring code.
-	Each and every declaration of behavior should appear OnceAndOnlyOnce"
-	
-	from http://c2.com/cgi/wiki?OnceAndOnlyOnce
-	--->
 	<cfset variables.pi         = "">
 	<cfset variables.action     = "">
 	<cfset variables.append     = FALSE>
@@ -20,16 +12,14 @@
 	<cfset variables.request    = "">
 	<cfset variables.result     = "">
 	<cfset variables.template   = "">
+	<cfset variables.type       = "">
 
 	<cffunction name="init">
 		<cfargument name="ParserInterface" required="true" type="ebxParserInterface">
-			<cfset variables.pi = arguments.ParserInterface>
+		<cfargument name="type" type="string" required="false" default="" hint="contexttype">
+			<cfset variables.pi     = arguments.ParserInterface>
+			<cfset setType(arguments.type)>
 		<cfreturn this>
-	</cffunction>
-	
-	<cffunction name="execute">
-		<cfset setResult(variables.pi.include(getTemplate()))>
-		<cfreturn hasErrors()>
 	</cffunction>
 	
 	<cffunction name="getAction">
@@ -72,18 +62,51 @@
 		<cfreturn variables.template>
 	</cffunction>
 	
+	<cffunction name="getType">
+		<cfreturn variables.type>
+	</cffunction>
+	
 	<cffunction name="hasErrors">
 		<cfreturn variables.errors>
+	</cffunction>
+	
+	<cffunction name="hasType">
+		<cfreturn getType() neq "">
 	</cffunction>
 	
 	<cffunction name="isExecutable">
 		<cfreturn variables.executable>
 	</cffunction>
 	
+	<cffunction name="isInclude">
+		<cfreturn getType() eq "include">
+	</cffunction>
+	
+	<cffunction name="isEmptyRequest">
+		<cfreturn getType() eq "" OR getType() eq "empty">
+	</cffunction>
+	
+	<cffunction name="isRequest">
+		<cfreturn getType() eq "request" OR isMainRequest()>
+	</cffunction>
+	
+	<cffunction name="isMainRequest">
+		<cfreturn getType() eq "mainrequest">
+	</cffunction>
+	
+	<cffunction name="parseRequest">
+		<cfif getAction() neq "">
+			<cfset setRequest(createObject("component", "ebxRequest").init(variables.pi, getAction(), getAttributes()))>
+		</cfif>
+	</cffunction>
+	
 	<cffunction name="setAction">
 		<cfargument name="action" type="string" required="true">
+		<cfargument name="parse"  type="boolean" required="false" default="true">
 		<cfset variables.action = arguments.action>
-		<cfset setRequest(createObject("component", "ebxRequest").init(variables.pi, getAction(), getAttributes()))>
+		<cfif arguments.parse>
+			<cfset parseRequest()>
+		</cfif>
 		<cfreturn true>
 	</cffunction>
 	
@@ -148,15 +171,22 @@
 		<cfset variables.result = arguments.result>
 		<cfset setCaught(variables.result.caught)>
 		<cfset setErrors(variables.result.errors)>
-		<cfif NOT hasErrors()>
+		<cfset setOutput(variables.result.output)>
+		<!--- <cfif NOT hasErrors()>
 			<cfset setOutput(variables.result.output)>
-		</cfif>		
+		</cfif>		 --->
 		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="setTemplate">
-		<cfargument name="Template" type="string" required="true">
+		<cfargument name="template" type="string" required="true">
 		<cfset variables.template = arguments.template>				
+		<cfreturn true>
+	</cffunction>
+	
+	<cffunction name="setType">
+		<cfargument name="type" type="string" required="true">
+		<cfset variables.type = arguments.type>
 		<cfreturn true>
 	</cffunction>
 	
@@ -177,7 +207,7 @@
 	<cffunction name="_dump">
 		<cfset var local = StructNew()>
 		<cfset local.struct = StructNew()>
-		<cfloop list="action,append,attributes,contentvar,originals,request,result,template" index="local.item">
+		<cfloop list="action,append,attributes,contentvar,originals,request,result,template,type" index="local.item">
 			<cftry>
 				<cfset StructInsert(local.struct, local.item, variables[local.item])>
 				<cfcatch type="any">
@@ -190,6 +220,9 @@
 	</cffunction>
 	
 	
+	<cffunction name="_qdump">
+		<cfoutput>#getType()# : #getTemplate()# / #getAction()# :<hr /> #getOutput()#<hr /></cfoutput>
+	</cffunction>
 	
 	
 	

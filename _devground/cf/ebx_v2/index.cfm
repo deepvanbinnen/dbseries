@@ -18,10 +18,13 @@
 <cfset request.ebx.initialise()>
 <cfset request.ebx.execute()>
 
-<!--- <cfloop from="1" to="#ArrayLen(request.ebx.stack.getStack())#" index="i">
-	<cfdump var="#request.ebx.stack.get(i)._dump()#" version="long">
+
+<!--- <cfset r= request.ebx.stack.getExecuted()>
+<cfloop from="1" to="#ArrayLen(r)#" index="i">
+	<cfdump var="#r[i]#" version="long">
 </cfloop> --->
-<cfdump var="#request.ebx#">
+
+<!--- <cfdump var="#request.ebx#"> --->
 <!--- <cfdump var="#a.indexOf(JavaCast( "string", "a"))#"> --->
 <!--- Used
 <cfparam name="attributes" default="#StructNew()#">
