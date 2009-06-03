@@ -8,20 +8,14 @@
 	<cfset variables.rootPath   = "">
 	<cfset variables.execDir    = "">
 	
-	<cfset variables.output      = "">
-	<cfset variables.attributes  = StructNew()>
-	
 	<cfset variables.executable  = false>
-	
-	<cfset variables.pi = "">
+
 	
 	<cffunction name="init">
 		<cfargument name="ParserInterface" required="true" type="ebxParserInterface">
 		<cfargument name="action"     required="true" type="string">
-		<cfargument name="attributes" required="false" type="struct" default="#StructNew()#">
 			<cfset variables.pi = arguments.ParserInterface>
 			<cfset parseAction(arguments.action)>
-			<cfset setAttributes(arguments.attributes)>
 		<cfreturn this>
 	</cffunction>	
 	
@@ -134,52 +128,4 @@
 			</cfif>
 		</cfloop>
 	</cffunction>
-	
-	<!--- <cffunction name="initParameters">
-		<cfargument name="params" type="struct" required="false" default="#variables.parameters#">
-		
-		<cfset var local = StructNew()>
-		<cftry>
-			<cfset variables.orgparams = StructNew()>
-			<cfset local.orgparams = getParameters()>
-			<cfloop collection="#arguments.params#" item="local.param">
-				<cfset local.value = arguments.params[local.param]>
-				
-				<!--- store parameter --->
-				<cfset local.orgvalue = getParameter(local.param)>
-				<cfif hasParameter(local.param)>
-					<cfset StructInsert(variables.orgparams, local.param, local.orgvalue, TRUE)>
-				</cfif>
-				<cfset setParameter(local.param, local.value)>
-				
-				<!--- store attribute --->
-				<cfset local.orgvalue = getAttribute(local.param)>
-				<cfif hasAttribute(local.param)>
-					<cfset StructInsert(variables.orgattribs, local.param, local.orgvalue, TRUE)>
-				</cfif>
-				<cfset setAttribute(local.param, local.value)>
-				
-			</cfloop>
-			<cfcatch type="any">
-				<cfset setError(caughtMessage(cfcatch))>
-				<cfreturn false>
-			</cfcatch>
-		</cftry>
-		<cfreturn true>
-	</cffunction>
-	
-	<cffunction name="releaseParameters">
-		<cfset var local = StructNew()>
-		<cfloop collection="#variables.orgparams#" item="local.param">
-			<cfset setDebug("release parameter: #local.param#", 0)>
-			<cfset setParameter(local.param, variables.orgparams[local.param])>
-		</cfloop>
-		<cfloop collection="#variables.orgattribs#" item="local.param">
-			<cfset setDebug("release attribute: #local.param#", 0)>
-			<cfset setAttribute(local.param, variables.orgattribs[local.param])>
-		</cfloop>
-	</cffunction> --->
-	
-	
-	
 </cfcomponent>

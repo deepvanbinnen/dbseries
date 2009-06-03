@@ -33,6 +33,7 @@
 	<cfset this.layout     = "">
 	<cfset this.layoutdir  = "">
 	<cfset this.layoutfile = "">
+	<cfset this.layoutpath = "">
 		
 	<cffunction name="init">
 		<cfargument name="ebx"        required="true"  type="ebx" hint="eBox instance">
@@ -104,8 +105,9 @@
 	</cffunction>
 	
 	<cffunction name="setCurrentRequest">
-		<cfargument name="request">
+		<cfargument name="request" type="ebxRequest">
 		<!--- <cfset this.thisRequest         = getRequest()> --->
+		<cfset this.act                 = arguments.request.get("act")>
 		<cfset this.thisAction          = arguments.request.get("fullact")>
 		<cfset this.thisCircuit         = arguments.request.get("circuit")>
 		<cfset this.act                 = arguments.request.get("act")>
@@ -116,7 +118,7 @@
 	
 	<cffunction name="setOriginalRequest">
 		<!--- <cfset this.originalRequest     = getOriginalRequest()> --->
-		<cfargument name="request">	
+		<cfargument name="request" type="ebxRequest">	
 		<cfset this.originalAction      = arguments.request.get("fullact")>
 		<cfset this.originalCircuit     = arguments.request.get("circuit")>
 		<cfset this.originalAct         = arguments.request.get("act")>
@@ -126,7 +128,7 @@
 	</cffunction>
 	
 	<cffunction name="setTargetRequest">
-		<cfargument name="request">	
+		<cfargument name="request" type="ebxRequest">	
 		<!--- <cfset this.targetRequest       = arguments.request> --->
 		<cfset this.targetAction        = arguments.request.get("fullact")>
 		<cfset this.targetCircuit       = arguments.request.get("circuit")>
@@ -152,6 +154,19 @@
 		<cfargument name="output">
 		<cfset setProperty("layout", arguments.output)>
 		<cfreturn true>
+	</cffunction>
+	
+	<cffunction name="hasLayoutPath">
+		<cfreturn getProperty("layoutpath") neq "">
+	</cffunction>
+	
+	<cffunction name="setLayoutPath">
+		<cfset setProperty("layoutpath", getProperty("layoutdir") & getProperty("layoutfile"), true, true)>
+		<cfreturn hasLayoutPath()>
+	</cffunction>
+	
+	<cffunction name="getTicks">
+		<cfreturn variables.pi.getTicks()>
 	</cffunction>
 
 </cfcomponent>

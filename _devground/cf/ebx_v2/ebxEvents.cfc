@@ -4,12 +4,6 @@
 	<cffunction name="init">
 		<cfargument name="ParserInterface" required="true" type="ebxParserInterface">
 			<cfset variables.pi     = arguments.ParserInterface>
-			
-			<cfset variables.parser = variables.pi.getParser()>
-			<cfset variables.stack  = variables.pi.getStackInterface()>
-			<cfset variables.page   = variables.pi.getEbxPageContext()>
-			
-			<cfset variables.ebx    = variables.parser.getEbx()>
 		<cfreturn this>
 	</cffunction>
 	
@@ -18,13 +12,17 @@
 	</cffunction>
 	
 	<cffunction name="OnAssignOutput">
+		<cfset variables.pi.tick("ASSIGNING OUTPUT")>
 		<cfif variables.pi.getContextVar() neq "">
 			<cfset variables.pi.assignVariable(variables.pi.getContextVar(), variables.pi.getContextOutput(), variables.pi.getContextAppend())>
+			<cfset variables.pi.tick("VARIABLE ASSIGNED")>
 		<cfelse>
 			<cfif variables.pi.isMainContextRequest()>
 				<cfset variables.pi.setLayout(variables.pi.getContextOutput())>
+				<cfset variables.pi.tick("LAYOUT SET")>
 			<cfelse>
 				<cfset variables.pi.flushOutput(variables.pi.getContextOutput())>
+				<cfset variables.pi.tick("OUTPUT FLUSHED")>
 			</cfif>
 		</cfif>
 		<cfreturn true>
@@ -71,17 +69,20 @@
 	</cffunction>
 	
 	<cffunction name="OnExecuteContext" hint="create a context">
-		<cfset var ctx = variables.pi.getCurrentContext()>
-		<cfset variables.pi.updateAttributes(ctx.getAttributes())>
-		<cfset ctx.setResult(variables.pi.include(ctx.getTemplate()))>
-		<cfset variables.pi.updateAttributes(ctx.getOriginals())>
-		<cfreturn NOT ctx.hasErrors()>
+		<cfset variables.pi.tick("START CONTEXT EXECUTE")>
+		<cfset variables.pi.customizeAttributes()>
+		<cfset variables.pi.setContextResult()>
+		<cfset variables.pi.restoreAttributes()>
+		<cfset variables.pi.tick("TEMPLATE INCLUDED")>
+		<cfreturn NOT variables.pi.hasContextErrors()>
 	</cffunction>
 	
 	<cffunction name="OnExecuteDo" hint="create a context">
 		<cfif OnCreateContext(argumentCollection=arguments)>
 			<cfif OnParseRequest()>
-				<cfreturn OnExecuteStackContext()>
+				<cfif OnExecuteStackContext()>
+					<cfreturn true>
+				</cfif>
 			</cfif>
 		</cfif>
 		<cfreturn false>
@@ -89,7 +90,9 @@
 	
 	<cffunction name="OnExecuteInclude" hint="create a context">
 		<cfif OnCreateContext(argumentCollection=arguments)>
-			<cfreturn OnExecuteStackContext()>
+			<cfif OnExecuteStackContext()>
+				<cfreturn true>
+			</cfif>
 		</cfif>
 		<cfreturn false>
 	</cffunction>
@@ -97,11 +100,11 @@
 	<cffunction name="OnExecuteMainRequest" hint="create a context">
 		<cfif OnCreateContext(type="mainrequest", action=variables.pi.getMainAction(), parse=true)>
 			<cfif OnParseRequest()>
-				<cfset OnAppendStack()>
-				<cfset OnExecuteContext()>
-				<cfset OnAssignOutput()>
-				<cfset OnUpdateStack()>
-				<cfset OnLayout()>
+				<cfif OnExecuteStackContext()>
+					<cfif OnLayout()>
+						<cfreturn true>
+					</cfif>
+				</cfif>
 			</cfif>
 		</cfif>
 		<cfreturn false>
@@ -116,6 +119,17 @@
 	</cffunction>
 	
 	<cffunction name="OnLayout" hint="create a context">
+		<cfif variables.pi.parseLayout()>
+			<cfif OnCreateContext(type="layout", template=variables.pi.getLayoutsFile(), parse=true)>
+				<cfif OnExecuteStackContext()>
+					<cfif variables.pi.setLayoutPath()>
+						<cfif OnCreateContext(type="include", template=variables.pi.getLayoutPath(), parse=true)>
+							<cfreturn OnExecuteStackContext()>
+						</cfif>
+					</cfif>
+				</cfif>
+			</cfif>
+		</cfif>
 		<cfset variables.pi.flushOutput(variables.pi.getProperty("layout"))>
 		<cfreturn true>
 	</cffunction>
@@ -142,7 +156,6 @@
 		</cfif>
 		<cfreturn false>
 	</cffunction>
-	
 	
 	<cffunction name="OnBoxPreAction" hint="returns number of errors in sink">
 		<cfreturn true>

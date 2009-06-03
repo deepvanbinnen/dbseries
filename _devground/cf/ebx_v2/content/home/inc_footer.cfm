@@ -1,2 +1,2 @@
-<p>ebx_v2 &copy;2009</p>
+<p>Forgot password? Please contact the administrator.</p>
 

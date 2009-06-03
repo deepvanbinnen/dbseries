@@ -1,6 +1,2 @@
-<cfoutput>
-<p>This only a test</p>
-#request.ebx.layout#
-</cfoutput>
-
-<!--- <p><cfoutput>#self#</cfoutput></p> --->
+<cfoutput>#request.ebx.layout#</cfoutput>
+<p style="clear: both;">ebx_v2 &copy;2009</p>

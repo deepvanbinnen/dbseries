@@ -33,17 +33,16 @@
 	
 	<cffunction name="getCircuitDir">
 		<cfargument name="circuit" required="true">
-		<cfif hasCircuit(arguments.circuit)>
-			<cfreturn variables.parameters.getParameter("circuits")[arguments.circuit]>
-		<cfelse>
-			<cfreturn "">
-		</cfif>
+		<cfreturn getCircuit(arguments.circuit)>
 	</cffunction>
 	
 	<cffunction name="getCircuit">
 		<cfargument name="circuit" required="true">
+		<cfset var local = StructNew()>
+		
 		<cfif hasCircuit(arguments.circuit)>
-			<cfreturn getCircuits()[arguments.circuit]>
+			<cfset local.circuits = getCircuits()>
+			<cfreturn local.circuits[arguments.circuit]>
 		</cfif>
 		<cfreturn "">
 	</cffunction>

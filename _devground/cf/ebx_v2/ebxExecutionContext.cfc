@@ -74,6 +74,10 @@
 		<cfreturn getType() neq "">
 	</cffunction>
 	
+	<cffunction name="isEmptyContext">
+		<cfreturn getType() eq "" OR getType() eq "empty">
+	</cffunction>
+	
 	<cffunction name="isExecutable">
 		<cfreturn variables.executable>
 	</cffunction>
@@ -82,11 +86,7 @@
 		<cfreturn getType() eq "include">
 	</cffunction>
 	
-	<cffunction name="isEmptyRequest">
-		<cfreturn getType() eq "" OR getType() eq "empty">
-	</cffunction>
-	
-	<cffunction name="isRequest">
+	<cffunction name="isLayoutRequest">
 		<cfreturn getType() eq "request" OR isMainRequest()>
 	</cffunction>
 	
@@ -94,9 +94,17 @@
 		<cfreturn getType() eq "mainrequest">
 	</cffunction>
 	
+	<cffunction name="isRequest">
+		<cfreturn getType() eq "request" OR isMainRequest()>
+	</cffunction>
+	
+	
+	
 	<cffunction name="parseRequest">
 		<cfif getAction() neq "">
-			<cfset setRequest(createObject("component", "ebxRequest").init(variables.pi, getAction(), getAttributes()))>
+			<cfset variables.pi.tick("CREATING REQUEST FOR: #getAction()#")>
+			<cfset setRequest(createObject("component", "ebxRequest").init(variables.pi, getAction()))>
+			<cfset variables.pi.tick("REQUEST CREATED FOR: #getAction()#")>
 		</cfif>
 	</cffunction>
 	
@@ -192,16 +200,20 @@
 	
 	<cffunction name="storeOriginals" returntype="boolean" hint="stores current attribute values only if they already exist">
 		<cfset var local = StructNew()>
-		<cfset local.attr = variables.pi.getAttributes()>
-		<cfset local.curr = getAttributes()>
-		<cfset local.copy = StructNew()>
 		
-		<cfloop collection="#local.curr#" item="local.param">
-			<cfif variables.pi.hasAttribute(local.param)>
-				<cfset StructInsert(local.copy, local.param, variables.pi.getAttribute(local.param), TRUE)>
-			</cfif>
-		</cfloop>
-		<cfreturn setOriginals(local.copy)>
+		<cfif NOT StructIsEmpty(getAttributes())>
+			<cfset local.attr = variables.pi.getAttributes()>
+			<cfset local.curr = getAttributes()>
+			<cfset local.copy = StructNew()>
+			
+			<cfloop collection="#local.curr#" item="local.param">
+				<cfif StructKeyExists(local.attr, local.param)>
+					<cfset StructInsert(local.copy, local.param, local.attr[local.param], TRUE)>
+				</cfif>
+			</cfloop>
+			<cfreturn setOriginals(local.copy)>
+		</cfif>
+		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="_dump">

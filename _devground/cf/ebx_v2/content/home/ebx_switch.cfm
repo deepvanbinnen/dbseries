@@ -21,6 +21,5 @@
 		<cfset request.ebx.include(template="inc_footer.cfm", contentvar="content.loginbox", append="true")>
 		<cfset request.ebx.include(template="inc_hometekst.cfm", contentvar="content.home")> 
 		<cfset request.ebx.include("dsp_tonen.cfm")>
-		<cfoutput>#y#</cfoutput>
 	</cfdefaultcase>
 </cfswitch>

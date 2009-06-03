@@ -2,6 +2,10 @@
 	<cfset variables.ebx          = "">
 	<cfset variables.Parser       = "">
 	<cfset variables.thisContext  = "">
+	<cfset variables.tickStart    = getTickCount()>
+	<cfset variables.lastTick     = variables.tickStart>
+	<cfset variables.ticks        = ArrayNew(1)>
+	<cfset variables.qticks       = QueryNew("a_LASTEXEC,a_TOTAL,LABEL,RCTX,TC")>
 
 	<cffunction name="init" returntype="ebxParserInterface">
 		<cfargument name="ebxParser"  type="ebxParser" required="true">
@@ -97,8 +101,15 @@
 		<cfset local.thisContext.setAppend(arguments.append)>
 		<cfset local.thisContext.setTemplate(arguments.template)>
 		<cfset local.thisContext.setAction(arguments.action, arguments.parse)>
-		
 		<cfreturn local.thisContext>
+	</cffunction>
+	
+	<cffunction name="customizeAttributes" returntype="any">
+		<cfif NOT StructIsEmpty(getContextAttributes())>
+			<cfset updateAttributes(getContextAttributes())>
+			<cfset tick("ATTRIBUTES CUSTOMIZED")>
+		</cfif>
+		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="flushOutput" returntype="boolean">
@@ -177,6 +188,10 @@
 		<cfreturn variables.thisContext.getType()>
 	</cffunction>
 	
+	<cffunction name="getContextString">
+		<cfreturn "#getContextType()# / #getContextTemplate()# / #getContextAction()#">
+	</cffunction>
+	
 	<cffunction name="getContextVar" returntype="any">
 		<cfreturn variables.thisContext.getContentVar()>
 	</cffunction>
@@ -211,8 +226,12 @@
 		<cfreturn arguments.name>
 	</cffunction>
 	
-	<cffunction name="getLayout">
-		<cfreturn getFilePath(variables.Parser.getProperty("layoutdir") & variables.Parser.getProperty("layoutfile"), true, false)>
+	<cffunction name="getLayoutPath">
+		<cfif variables.Parser.hasLayoutPath()>
+			<cfreturn getFilePath(variables.Parser.getProperty("layoutpath"), true, false)>
+		<cfelse>
+			<cfreturn "">		
+		</cfif>
 	</cffunction>
 	
 	<cffunction name="getLayoutsFile">
@@ -249,6 +268,10 @@
 	<cffunction name="getSwitchFile">
 		<cfreturn getFilePath(getParameter("switchfile"))>
 	</cffunction>
+	
+	<cffunction name="getTicks" returntype="any">
+		<cfreturn variables.qticks>
+	</cffunction>
 		
 	<cffunction name="getVar" returntype="any">
 		<cfargument name="name"  type="string" required="true">
@@ -272,9 +295,17 @@
 		<cfreturn variables.ebx.hasCircuit(arguments.name)>
 	</cffunction>
 
+	<cffunction name="hasLayoutPath">
+		<cfreturn variables.Parser.hasLayoutPath()>
+	</cffunction>
+
 	<cffunction name="include" returntype="struct">
 		<cfargument name="template"      type="string" required="true">
 		<cfreturn getEbxPageContext().ebx_include(arguments.template)>
+	</cffunction>
+	
+	<cffunction name="isEmptyContext">
+		<cfreturn variables.thisContext.isEmptyContext()>
 	</cffunction>
 	
 	<cffunction name="isContextInclude">
@@ -283,6 +314,10 @@
 	
 	<cffunction name="isContextRequest">
 		<cfreturn variables.thisContext.isRequest()>
+	</cffunction>
+	
+	<cffunction name="isLayoutRequest">
+		<cfreturn variables.thisContext.isLayoutRequest()>
 	</cffunction>
 
 	<cffunction name="isMainContextRequest">
@@ -296,6 +331,14 @@
 	<cffunction name="parseLayout" returntype="boolean">
 		<cfreturn NOT variables.Parser.getProperty("nolayout")>
 	</cffunction>
+	
+	<cffunction name="restoreAttributes" returntype="any">
+		<cfif NOT StructIsEmpty(getContextOriginals())>
+			<cfset updateAttributes(getContextOriginals())>
+			<cfset tick("ATTRIBUTES RESTORED")>
+		</cfif>
+		<cfreturn true>
+	</cffunction>	
 	
 	<cffunction name="setAttributes" returntype="any">
 		<cfargument name="attribs" type="struct" required="true">
@@ -311,9 +354,17 @@
 		<cfreturn setThisContext(getEmptyContext())>
 	</cffunction>
 	
+	<cffunction name="setContextResult" returntype="any">
+		<cfreturn variables.thisContext.setResult(include(getContextTemplate()))>
+	</cffunction>
+	
 	<cffunction name="setLayout" returntype="boolean">
 		<cfargument name="layout" type="string" required="true">
 		<cfreturn variables.Parser.setLayout(arguments.layout)>
+	</cffunction>
+	
+	<cffunction name="setLayoutPath">
+		<cfreturn variables.Parser.setLayoutPath()>
 	</cffunction>
 	
 	<cffunction name="setThisContext" returntype="boolean">
@@ -322,6 +373,29 @@
 		<cfreturn true>
 	</cffunction>
 	
+	
+	<cffunction name="tick" returntype="any">
+		<cfargument name="label" type="string" required="false" default="">
+		<cfset var local = StructNew()>
+		
+		<cfset local.currtick = getTickCount()>
+		
+		<cfset QueryAddRow(variables.qticks)>
+		<cfset QuerySetCell(variables.qticks,"a_LASTEXEC",local.currtick-variables.lastTick)>
+		<cfset QuerySetCell(variables.qticks,"a_TOTAL",local.currtick-variables.tickStart)>
+		<cfset QuerySetCell(variables.qticks,"LABEL",arguments.label)>
+		<cfset QuerySetCell(variables.qticks,"RCTX",getContextString())>
+		
+		<cfsavecontent variable="local.tickmsg">
+			<cfoutput><cfif arguments.label neq "">#arguments.label#:</cfif>#local.currtick-variables.lastTick#ms | #local.currtick-variables.tickStart#ms</cfoutput>
+		</cfsavecontent>
+		<cfset ArrayAppend(variables.ticks, local.tickmsg)>
+		<cfset variables.lastTick = local.currtick>
+		<cfset QuerySetCell(variables.qticks,"TC",getTickCount()-local.currtick)>
+		<cfreturn true>
+	</cffunction>
+	
+	
 	<cffunction name="updateAttributes" returntype="any">
 		<cfargument name="attributes" type="struct" required="true" default="#StructNew()#">
 		
@@ -329,7 +403,7 @@
 		<cfset local.attr = getAttributes()>
 		<cfset StructAppend(local.attr, arguments.attributes, TRUE)>
 		<cfreturn setAttributes(local.attr)>
-	</cffunction>	
+	</cffunction>
 	
 	<cffunction name="updateContext" returntype="boolean">
 		<cfset setThisContext(variables.stack.getCurrent())>
@@ -353,5 +427,10 @@
 		<cfset updateParser()>
 		<cfreturn true>
 	</cffunction>
+	
+	<cffunction name="_test" returntype="ebxExecutionContext">
+		<cfreturn createObject("component", "ebxMyContext").init(this)>
+	</cffunction>
+	
 	
 </cfcomponent>

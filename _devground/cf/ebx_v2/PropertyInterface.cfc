@@ -117,8 +117,8 @@
 	</cffunction>
 	
 	<cffunction name="setProperty" returntype="boolean" access="private" hint="returns true on success otherwise false">
-		<cfargument name="key"   required="true"  type="string"  hint="key to update">
-		<cfargument name="value" required="false" type="any"     default="" hint="value for the key">
+		<cfargument name="key"       required="true"  type="string"  hint="key to update">
+		<cfargument name="value"     required="false" type="any"     default="" hint="value for the key">
 		<cfargument name="force"     required="false" type="boolean" default="false" hint="force setting property">
 		<cfargument name="overwrite" required="false" type="boolean" default="true" hint="overwrite property">
 	
