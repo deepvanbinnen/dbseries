@@ -17,6 +17,9 @@
 		<cfset variables.pc    = createObject("component", "ebxPageContext")>
 		<cfset variables.cf    = createObject("component", "ebxContextFactory").init(this)>
 		<cfset variables.stack = createObject("component", "ebxExecutionStack").init(variables.cf.getEmptyContext())>
+		<!--- <cfset variables.evt   = createObject("component", "ebxEvents").init(this)>
+		<cfset variables.phi   = createObject("component", "ebxPhases").init(this)> --->
+		
 		<cfset setAttributes(arguments.attributes)>
 		
 		<cfreturn this>
@@ -57,6 +60,25 @@
 		<cfreturn getEbxPageContext().ebx_get(arguments.name, arguments.value)>
 	</cffunction>
 	
+	<!--- Context factory --->
+<!--- 	<cffunction name="createIncludeContext" returntype="any">
+		<cfset variables.cf.parseContext(argumentCollection=arguments)>
+		<cfset variables.cf.getIncludeContext()>
+	</cffunction> --->
+	
+	
+	<!--- Stack --->
+	<!--- <cffunction name="appendStack" returntype="any">
+		<cfreturn variables.stack.add(variables.thisContext)>
+	</cffunction>
+		
+	<cffunction name="updateStack" returntype="any">
+		<cfset variables.stack.remove()>
+		<cfset updateContext()>
+		<cfset updateParser()>
+		<cfreturn true>
+	</cffunction>
+	 --->
 	<cffunction name="maxRequestsReached" returntype="boolean">
 		<cfreturn getStackInterface().maxReached()>
 	</cffunction>
@@ -67,9 +89,35 @@
 		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="getCurrentContext" returntype="ebxContext">
-		<cfreturn variables.thisContext>
+	<!--- Context --->
+	<!--- <cffunction name="setThisContext" returntype="boolean">
+		<cfargument name="context" type="any" required="true">
+		<cfset variables.thisContext = arguments.context>
+		<cfreturn true>
 	</cffunction>
+	
+	<cffunction name="contextIsExecutable">
+		<cfreturn variables.thisContext.isExecutable()>
+	</cffunction>
+	
+	<cffunction name="createContext"  returntype="ebxExecutionContext" hint="create a executioncontext and on success set the default arguments">
+		<cfargument name="type"       required="true"   type="string"  hint="the contexttype (request|include|mainrequest|empty)">
+		<cfargument name="attributes" required="false"  type="struct"  default="#StructNew()#" hint="custom attributes">
+		<cfargument name="contentvar" required="false"  type="string"  default=""              hint="variable to use for output">
+		<cfargument name="append"     required="false"  type="boolean" default="false"         hint="append the contentvar">
+		<cfargument name="template"   required="false"  type="string"  default=""              hint="full mapping-path to template">
+		<cfargument name="action"     required="false"  type="string"  default=""              hint="action">
+		<cfargument name="parse"      required="false"  type="boolean" default="true"          hint="depending on type, parse action or result for an template immediately">
+		
+		<cfset var local = StructNew()>
+		<cfset local.thisContext = createObject("component", "ebxExecutionContext").init(this, arguments.type)>
+		<cfset local.thisContext.setAttributes(arguments.attributes)>
+		<cfset local.thisContext.setContentVar(arguments.contentvar)>
+		<cfset local.thisContext.setAppend(arguments.append)>
+		<cfset local.thisContext.setTemplate(arguments.template)>
+		<cfset local.thisContext.setAction(arguments.action, arguments.parse)>
+		<cfreturn local.thisContext>
+	</cffunction> --->
 	
 	<cffunction name="parseContext">
 		<cfargument name="action"     required="true"  type="string">
@@ -77,46 +125,13 @@
 		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#">
 		<cfargument name="contentvar" required="false" type="string"  default="">
 		<cfargument name="append"     required="false" type="boolean" default="false">
-		
 		<cftry>
 			<cfreturn variables.cf.parseContext(argumentCollection=arguments)>
 			<cfcatch type="any">
 				<cfdump var="#cfcatch#"><cfabort>
 			</cfcatch>
 		</cftry>
-	</cffunction>
-	
-	<cffunction name="createContext">
-		<cfargument name="type"     required="true"  type="string">
-		<cfargument name="action"     required="true"  type="string">
-		<cfargument name="template"   required="true"  type="string">
-		<cfargument name="circuitdir" required="false" type="string" default="">
-		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#">
-		<cfargument name="contentvar" required="false" type="string"  default="">
-		<cfargument name="append"     required="false" type="boolean" default="false">
 		
-		<cfset variables.cf.createContext(argumentCollection=arguments)>
-		<cfreturn setContextFromFactory(arguments.type)>
-	</cffunction>
-	
-	<cffunction name="getParsedAction">
-		<cfargument name="action"     required="true"  type="string">
-		
-		<cfset var local = StructNew()>
-		<cfset local.result = StructNew()>
-		
-		<cfif ListLen(arguments.action, ".") eq 3 AND hasInternal(arguments.action)>
-			<cfset local.result.action  = arguments.action>
-			<cfset local.result.circuitdir = getInternalExecDir(arguments.action)>
-		<cfelseif ListLen(arguments.action, ".") eq 2 AND hasCircuit(ListFirst(arguments.action, "."))>
-			<cfset local.result.action  = arguments.action>
-			<cfset local.result.circuitdir = getCircuitExecDir(ListFirst(arguments.action, "."))>
-		<cfelseif ListLen(arguments.action, ".") eq 1 AND getProperty("thisCircuit") neq "">
-			<cfset local.result.action    = getProperty("thisCircuit") & "." & arguments.action>
-			<cfset local.result.circuitdir = getProperty("circuitdir")>
-		</cfif>
-		
-		<cfreturn local.result>
 	</cffunction>
 	
 	<cffunction name="setContextFromFactory">
@@ -130,9 +145,6 @@
 			</cfcase>
 			<cfcase value="layout">
 				<cfset setThisContext(variables.cf.getLayoutContext())>
-			</cfcase>
-			<cfcase value="plugin">
-				<cfset setThisContext(variables.cf.getPluginContext())>
 			</cfcase>
 			<cfcase value="mainrequest">
 				<cfset setThisContext(variables.cf.getMainRequestContext())>
@@ -199,6 +211,7 @@
 		<cfset var local = StructNew()>
 		<cfset local.keylist  = ListToArray("action,circuitdir,circuit,rootpath,execdir,act")>
 		<cfset local.thislist = ListToArray("thisAction,circuitdir,thisCircuit,rootpath,execdir,act")>
+		
 		<cfloop list="#arguments.types#" index="local.type">
 			<cfswitch expression="#local.type#">
 				<cfcase value="current">
@@ -234,24 +247,145 @@
 		<!--- --->
 	</cffunction>
 	
+	<!--- <cffunction name="executeInclude">
+		<cfif NOT maxRequestsReached()>
+			<cfif variables.cf.parseContext(
+				  action="internal.circuit.include"
+				, template=arguments.template
+				, attributes=arguments.attributes
+				, contentvar=arguments.contentvar
+				, append=arguments.append
+				)>
+				<cfset setThisContext(variables.cf.getIncludeContext())>
+				<!--- <cfreturn variables.evt.OnExecuteStackContext()> --->
+			</cfif>	
+		</cfif>
+		<cfreturn false>
+	</cffunction>
+	
+	<cffunction name="executeRequest">
+		<cfif NOT maxRequestsReached()>
+			<cfif variables.cf.parseContext(
+				  action=arguments.action
+				, template=getParameter("switchfile")
+				, attributes=arguments.attributes
+				, contentvar=arguments.contentvar
+				, append=arguments.append
+				)>
+				<cfset setThisContext(variables.cf.getIncludeContext())>
+				<!--- <cfreturn variables.evt.OnExecuteStackContext()> --->
+			</cfif>
+		</cfif>
+		<cfreturn false>
+	</cffunction>
+	 --->
+	
 	<cffunction name="getInternal" returntype="string">
 		<cfargument name="action"     required="false"  type="string"  default=""              hint="action">
 		<cfreturn variables.ebx.getInternal(arguments.action)>
 	</cffunction>
 	
-	<cffunction name="hasInternal" returntype="string">
-		<cfargument name="action"     required="false"  type="string"  default=""              hint="action">
-		<cfreturn variables.ebx.hasInternal(ListLast(arguments.action, '.'))>
-	</cffunction>
-	
 	<cffunction name="getMainAction">
 		<cfreturn getAttribute(getParameter("actionvar"), getParameter("defaultact"))>
 	</cffunction>
+	<!--- 
+	<cffunction name="getContextAction" returntype="any">
+		<cfreturn variables.thisContext.getAction()>
+	</cffunction>
+	
+	<cffunction name="getContextAppend" returntype="any">
+		<cfreturn variables.thisContext.getAppend()>
+	</cffunction>
+	
+	<cffunction name="getContextAttributes">
+		<cfreturn variables.thisContext.getAttributes()>
+	</cffunction>
+
+	<cffunction name="getContextCaught">
+		<cfreturn  variables.thisContext.getCaught()>
+	</cffunction>
+	
+	<cffunction name="getContextErrors">
+		<cfreturn  variables.thisContext.getErrors()>
+	</cffunction>
+	
+	<cffunction name="getContextOriginals">
+		<cfreturn variables.thisContext.getOriginals()>
+	</cffunction>
+	
+	<cffunction name="getContextOutput" returntype="any">
+		<cfreturn variables.thisContext.getOutput()>
+	</cffunction>
+	
+	<cffunction name="getContextRequest" returntype="any">
+		<cfreturn variables.thisContext.getRequest()>
+	</cffunction>
+
+	<cffunction name="getContextResult">
+		<cfreturn  variables.thisContext.getResult()>
+	</cffunction>
+	
+	<cffunction name="getContextTemplate" returntype="any">
+		<cfreturn variables.thisContext.getTemplate()>
+	</cffunction>
+	
+	<cffunction name="getContextType" returntype="any">
+		<cfreturn variables.thisContext.getType()>
+	</cffunction>
+	
+	<cffunction name="getContextString">
+		<cfreturn "#getContextType()# / #getContextTemplate()# / #getContextAction()#">
+	</cffunction>
+	
+	<cffunction name="getContextVar" returntype="any">
+		<cfreturn variables.thisContext.getContentVar()>
+	</cffunction>
+	
+	<cffunction name="getCurrentContext" returntype="any">
+		<cfreturn variables.thisContext>
+	</cffunction>
+	
+	<cffunction name="isEmptyContext">
+		<cfreturn variables.thisContext.isEmptyContext()>
+	</cffunction>
+	
+	<cffunction name="isContextInclude">
+		<cfreturn variables.thisContext.isInclude()>
+	</cffunction>
+	
+	<cffunction name="isContextRequest">
+		<cfreturn variables.thisContext.isRequest()>
+	</cffunction>
+	
+	<cffunction name="isLayoutRequest">
+		<cfreturn variables.thisContext.isLayoutRequest()>
+	</cffunction>
+
+	<cffunction name="isMainContextRequest">
+		<cfreturn variables.thisContext.isMainRequest()>
+	</cffunction> --->
+	
+	<!--- <cffunction name="setContextTemplate" returntype="any">
+		<cfargument name="template" type="string" required="true">
+		<cfreturn variables.thisContext.setTemplate(arguments.template)>
+	</cffunction>
+	
+	<cffunction name="setEmptyContext" returntype="boolean">
+		<cfreturn setThisContext(getEmptyContext())>
+	</cffunction>
+	
+	<cffunction name="setContextResult" returntype="any">
+		<cfreturn variables.thisContext.setResult(include(getContextTemplate()))>
+	</cffunction> --->
 	
 	<cffunction name="updateContext" returntype="boolean">
 		<cfset variables.thisContext = variables.stack.getCurrent()>
 		<cfreturn true>
 	</cffunction>
+	
+	<!--- <cffunction name="hasContextErrors">
+		<cfreturn  variables.thisContext.hasErrors()>
+	</cffunction> --->
 	
 	<!--- Interfaces --->
 	<cffunction name="getParser" returntype="ebxParser">
@@ -262,28 +396,19 @@
 		<cfreturn variables.pc>
 	</cffunction>
 	
+	<cffunction name="getEventInterface" returntype="ebxEvents">
+		<cfreturn variables.evt>
+	</cffunction>
+	
 	<cffunction name="getStackInterface" returntype="ebxExecutionStack">
 		<cfreturn variables.stack>
 	</cffunction>
 	
+	<cffunction name="getEmptyContext" returntype="ebxExecutionContext">
+		<cfreturn variables.emptyContext>
+	</cffunction>
+	
 	<!--- Path related --->
-	<cffunction name="getInternalExecDir">
-		<cfargument name="action" type="string" required="true">
-		<cfset var local = StructNew()>
-		
-		<cfset local.pathvar = getInternal(ListLast(arguments.action, "."))>
-		<cfif local.pathvar neq "">
-			<cfreturn getProperty(local.pathvar)>
-		</cfif>
-		<cfreturn "">
-	</cffunction>
-	
-	<cffunction name="getCircuitExecDir">
-		<cfargument name="circuit" type="string" required="true">
-		<cfreturn variables.ebx.getCircuitDir(arguments.circuit)>
-	</cffunction>
-	
-	
 	<cffunction name="getAppPath">
 		<cfreturn variables.ebx.getAppPath()>
 	</cffunction>
@@ -317,6 +442,53 @@
 		<cfreturn variables.Parser.setLayout(arguments.layout)>
 	</cffunction>
 	
+	<!--- <cffunction name="getLayoutPath">
+		<cfif variables.Parser.hasLayoutPath()>
+			<cfreturn getFilePath(variables.Parser.getProperty("layoutpath"), true, false)>
+		<cfelse>
+			<cfreturn "">		
+		</cfif>
+	</cffunction>
+	
+	<cffunction name="getSettingsFile">
+		<cfreturn getFilePath(getParameter("settingsfile"))>
+	</cffunction>
+	
+	<cffunction name="getSwitchFile">
+		<cfreturn getFilePath(getParameter("switchfile"))>
+	</cffunction>
+	
+	<cffunction name="getLayoutsFile">
+		<cfreturn getFilePath(getParameter("layoutsfile"), true, false)>
+	</cffunction>
+	
+	<cffunction name="setLayout" returntype="boolean">
+		<cfargument name="layout" type="string" required="true">
+		<cfreturn variables.Parser.setLayout(arguments.layout)>
+	</cffunction>
+	
+	<cffunction name="setLayoutPath">
+		<cfreturn variables.Parser.setLayoutPath()>
+	</cffunction>
+	
+	<cffunction name="hasCircuit">
+		<cfargument name="name" type="string" required="true">
+		<cfreturn variables.ebx.hasCircuit(arguments.name)>
+	</cffunction>
+	
+	<cffunction name="getCircuitDir">
+		<cfargument name="name" type="string" required="true">
+		<cfreturn variables.ebx.getCircuitDir(arguments.name)>
+	</cffunction>
+	
+	<cffunction name="hasLayoutPath">
+		<cfreturn variables.Parser.hasLayoutPath()>
+	</cffunction>
+	
+	<cffunction name="parseLayout" returntype="boolean">
+		<cfreturn NOT variables.Parser.getProperty("nolayout")>
+	</cffunction> --->
+	
 	<cffunction name="getParameter" returntype="any">
 		<cfargument name="name"  type="string" required="true">
 		<cfreturn variables.Parser.getParameter(arguments.name)>
@@ -334,6 +506,22 @@
 		<cfreturn variables.Parser.setProperty(arguments.key, arguments.value)>
 	</cffunction>
 	
+	<!--- Parser I/O
+	<cffunction name="updateParser" returntype="boolean">
+		<cfif isContextRequest()>
+			<cfset variables.Parser.setCurrentRequest(getContextRequest())>
+			<cfset variables.Parser.setTargetRequest(getContextRequest())>
+			<cfif isMainContextRequest()>
+				<cfset variables.Parser.setOriginalRequest(getContextRequest())>
+			</cfif>
+		</cfif>
+		<cfreturn true>
+	</cffunction>
+	
+	<cffunction name="getTicks" returntype="any">
+		<cfreturn variables.qticks>
+	</cffunction> --->
+		
 	<!--- Attributes --->
 	<cffunction name="getAttribute" returntype="any">
 		<cfargument name="name"  type="string" required="true">
@@ -363,6 +551,85 @@
 		
 		<cfreturn StructKeyExists(arguments.attributes, arguments.name)>
 	</cffunction>
+
+	<!--- 
+	<cffunction name="restoreAttributes" returntype="any">
+		<cfif NOT StructIsEmpty(getContextOriginals())>
+			<cfset updateAttributes(getContextOriginals())>
+			<cfset tick("ATTRIBUTES RESTORED")>
+		</cfif>
+		<cfreturn true>
+	</cffunction>	
+	
+	<cffunction name="updateAttributes" returntype="any">
+		<cfargument name="attributes" type="struct" required="true" default="#StructNew()#">
+		<cfset var local  = StructNew()>
+		<cfset local.attr = getAttributes()>
+		<cfset StructAppend(local.attr, arguments.attributes, TRUE)>
+		<cfreturn setAttributes(local.attr)> 
+		<!--- --->
+	</cffunction>
+	
+	<cffunction name="customizeAttributes" returntype="any">
+		<cfif NOT StructIsEmpty(getContextAttributes())>
+			<cfset updateAttributes(getContextAttributes())>
+			<cfset tick("ATTRIBUTES CUSTOMIZED")>
+		</cfif>
+		<cfreturn true>
+	</cffunction> --->
+	
+	
+	
+	<!--- Phases
+	<cffunction name="execPhaseList" returntype="boolean">
+		<cfargument name="phaselist" type="string" required="true">
+		
+		<cfset var local = StructNew()>
+		<cfset local.result = false>
+		
+		<cfloop list="#arguments.phaselist#" index="local.phase">
+			<cfset local.result = variables.phi.execPhase(local.phase)>
+			<cfif NOT local.result>
+				<cfbreak>
+			</cfif>
+		</cfloop>
+		<cfreturn local.result>
+	</cffunction>
+	
+	<cffunction name="setPhase" returntype="boolean">
+		<cfargument name="phase" type="string" required="true">
+		<cfset variables.Parser.setPhase(phase)>
+		<cfreturn true>
+	</cffunction>
+	
+	<cffunction name="setState" returntype="boolean">
+		<cfargument name="state" type="string" required="true">
+		<cfset variables.Parser.setState(state)>
+		<cfreturn true>
+	</cffunction> --->
+	
+	
+	<!--- <cffunction name="tick" returntype="any">
+		<cfargument name="label" type="string" required="false" default="">
+		<cfset var local = StructNew()>
+		
+		<!--- <cfset local.currtick = getTickCount()>
+		
+		<cfset QueryAddRow(variables.qticks)>
+		<cfset QuerySetCell(variables.qticks,"a_LASTEXEC",local.currtick-variables.lastTick)>
+		<cfset QuerySetCell(variables.qticks,"a_TOTAL",local.currtick-variables.tickStart)>
+		<cfset QuerySetCell(variables.qticks,"LABEL",arguments.label)>
+		<cfset QuerySetCell(variables.qticks,"RCTX",getContextString())>
+		
+		<cfsavecontent variable="local.tickmsg">
+			<cfoutput><cfif arguments.label neq "">#arguments.label#:</cfif>#local.currtick-variables.lastTick#ms | #local.currtick-variables.tickStart#ms</cfoutput>
+		</cfsavecontent>
+		<cfset ArrayAppend(variables.ticks, local.tickmsg)>
+		<cfset variables.lastTick = local.currtick>
+		<cfset QuerySetCell(variables.qticks,"TC",getTickCount()-local.currtick)> --->
+		<cfreturn true>
+	</cffunction> --->
+	
 	
 	<cffunction name="appendVariable">
 		<cfargument name="orginal" required="true" type="any" hint="pagevariable to set">

@@ -40,7 +40,7 @@
 	
 	<cffunction name="hasProperty" returntype="boolean" access="public" hint="returns true on success otherwise false">
 		<cfargument name="key"   required="true"  type="string" hint="key to update">
-		<cfreturn StructKeyExists(this, arguments.key) AND IsSimpleValue(this[arguments.key])>
+		<cfreturn StructKeyExists(this, arguments.key)>
 	</cffunction>
 	
 	<cffunction name="retainList" access="public">
@@ -116,7 +116,7 @@
 		<cfreturn this>
 	</cffunction>
 	
-	<cffunction name="setProperty" returntype="boolean" access="private" hint="returns true on success otherwise false">
+	<cffunction name="setProperty" returntype="boolean" access="public" hint="returns true on success otherwise false">
 		<cfargument name="key"       required="true"  type="string"  hint="key to update">
 		<cfargument name="value"     required="false" type="any"     default="" hint="value for the key">
 		<cfargument name="force"     required="false" type="boolean" default="false" hint="force setting property">
@@ -133,7 +133,7 @@
 	</cffunction>
 	
 	<cffunction name="setProperties" access="private" hint="set properties from a data object">
-		<cfargument name="data"      required="true"  type="any"     hint="the object that holds the data">
+		<cfargument name="data"      required="true"  type="any"     hint="any value keys can be extracted">
 		<cfargument name="force"     required="false" type="boolean" default="false" hint="force setting property">
 		<cfargument name="overwrite" required="false" type="boolean" default="true"  hint="overwrite property">
 		<cfargument name="recidx"    required="false" type="numeric" default="1"     hint="the record index used if objectdata is queryable">

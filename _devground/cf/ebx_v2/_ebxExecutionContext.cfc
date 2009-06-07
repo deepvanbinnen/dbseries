@@ -98,8 +98,6 @@
 		<cfreturn getType() eq "request" OR isMainRequest()>
 	</cffunction>
 	
-	
-	
 	<cffunction name="parseRequest">
 		<cfif getAction() neq "">
 			<cfset variables.pi.tick("CREATING REQUEST FOR: #getAction()#")>

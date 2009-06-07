@@ -6,13 +6,27 @@
 	<cfset request.ebx.setup()>
 	
 	<cfset request.ebx = request.ebx.getParser()>
-	<!--- <cfset request.ebx.initialise()> --->
 	<cfset request.ebx.execute()>
 </cfsavecontent>
 
 <cfoutput>#sf.freeTheSource(pageOutput)#</cfoutput>
-
-<!--- <cfset intf = request.ebx.getInterface()._test()>
-<cfdump var="#intf#"> --->
-<!--- <cfdump var="#request.ebx.getTicks()#"> --->
 <cfoutput><p style="clear: both;">Code executed in: #getTickCount()-start_exec#ms</p></cfoutput>
+
+<cfdump var="#request.ebx.getEbx()#">
+
+<!--- 
+STACK DEBUGGING
+<cfset pi = request.ebx.getInterface()>
+<cfset debug = pi.getExecutedStack()>
+<cfloop from="1" to="#ArrayLen(debug)#" index="i">
+	<cfdump var="#debug[i]._dump()#">
+</cfloop>
+<cfdump var="#debug#" version="long">
+
+CONTEXT DEBUGGING
+<cfdump var="#pi.getCurrentContext()._dump()#">
+
+EBX DEBUGGING
+<cfdump var="#request.ebx#">
+
+ --->

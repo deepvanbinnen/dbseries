@@ -1,3 +1,7 @@
+<cfif request.ebx.isOriginalAction()>
+	<cfset ArrayAppend(request.ebx.postPlugins, "dumpContext")>
+</cfif>
+
 <cfswitch expression="#request.ebx.act#">
 	<cfcase value="box">
 		<cfparam name="attributes.title"  default="aaa">
@@ -52,9 +56,17 @@
 		<cfset request.ebx.do(action="home.box", params=sidebarBox)>
 	</cfcase>
 	
-	<cfdefaultcase>
+	<cfcase value="complex">
 		<cfset request.ebx.do(action="home.loginbox", contentvar="content.sidebar", append="true")>
 		<cfset request.ebx.do(action="home.downloadbutton", contentvar="content.sidebar", append="true")>
 		<cfset request.ebx.include("dsp_tonen.cfm")>
+	</cfcase>
+	
+	<cfcase value="tonen">
+		aaaa<cfset request.ebx.include("dsp_tonen.cfm")>
+	</cfcase>
+	
+	<cfdefaultcase>
+		<cfinclude template="dsp_tonen.cfm">
 	</cfdefaultcase>
 </cfswitch>

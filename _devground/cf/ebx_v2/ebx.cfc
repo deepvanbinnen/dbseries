@@ -2,7 +2,18 @@
 	<!--- global flag --->
 	<cfset variables.initialised = FALSE>
 	<!--- declare parameters --->
-	<cfset variables.parameters  = createObject("component", "ebxParameters").init(this)>
+	<cfset variables.parameters       = createObject("component", "ebxParameters").init(this)>
+	<!--- Used when action has 3 dots
+	Define a map of "internal circuit" to "public parser variable" (e.g request.ebx.appPath,..) 
+	that contain the current execution directory.
+	--->
+	<cfset variables.internal = StructNew()>
+	<cfset variables.internal.settings = "configdir">
+	<cfset variables.internal.layouts  = "configdir">
+	<cfset variables.internal.plugins  = "configdir">
+	
+	<cfset variables.internal.include  = "circuitdir">
+	<cfset variables.internal.layout   = "layoutdir">
 	
 	<cffunction name="init">
 		<cfargument name="appPath"      required="true"  type="string"  default="" hint="coldfusion mapping to the root of the box">
@@ -51,10 +62,17 @@
 		<cfreturn getParameter("circuits", StructNew())>
 	</cffunction>
 	
-	<cffunction name="getFile">
-		<cfargument name="name"    required="true" type="string">
-		<cfargument name="circuit" required="false" type="string" default="">
-		<cfreturn getAppPath() & getCircuitDir(arguments.circuit) & arguments.name>
+	<cffunction name="getInternal" returntype="string">
+		<cfargument name="internal" type="string" required="true">
+		<cfif hasInternal(arguments.internal)>
+			<cfreturn variables.internal[arguments.internal]>
+		</cfif>
+		<cfreturn "">
+	</cffunction>
+	
+	<cffunction name="hasInternal" returntype="string">
+		<cfargument name="internal" type="string" required="true">
+		<cfreturn StructKeyExists(variables.internal, arguments.internal)>
 	</cffunction>
 	
 	<cffunction name="getParameter">
@@ -112,14 +130,14 @@
 		<cfset result.pagecontext = createObject("component", "ebxPageContext")>
 		
 		<cfif arguments.parsecircuitfile>
-			<cfset result.output = result.pagecontext.ebx_include(getFile(getParameter("circuitsfile")))>
+			<cfset result.output = result.pagecontext.ebx_include(getAppPath() & getParameter("circuitsfile"))>
 			<cfif NOT result.output.errors>
 				<cfset setParameter("circuits", this.circuits, true)>
 			</cfif>
 		</cfif>
 		
 		<cfif arguments.parsepluginsfile>
-			<cfset result.output = result.pagecontext.ebx_include(getFile(getParameter("pluginsfile")))>
+			<cfset result.output = result.pagecontext.ebx_include(getAppPath() & getParameter("pluginsfile"))>
 			<cfif NOT result.output.errors>
 				<cfset setParameter("plugins", this.plugins, true)>
 			</cfif>

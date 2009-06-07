@@ -12,7 +12,7 @@
 	</cffunction>
 	
 	<cffunction name="OnAssignOutput">
-		<cfset variables.pi.tick("ASSIGNING OUTPUT")>
+		<!--- <cfset variables.pi.tick("ASSIGNING OUTPUT")> --->
 		<cfif variables.pi.getContextVar() neq "">
 			<cfset variables.pi.assignVariable(variables.pi.getContextVar(), variables.pi.getContextOutput(), variables.pi.getContextAppend())>
 			<cfset variables.pi.tick("VARIABLE ASSIGNED")>
@@ -44,8 +44,8 @@
 		<cfloop list="#local.scopes#" index="local.scope">
 			<cfset variables.pi.updateAttributes(variables.pi.getVar(local.scope, StructNew()))>
 		</cfloop>
-		<cfset OnParseSettings()>
-		<cfreturn true>		
+		
+		<cfreturn true>
 	</cffunction>
 	
 	<cffunction name="OnBoxPreprocess" hint="preprocess request, set original action">
@@ -97,19 +97,6 @@
 		<cfreturn false>
 	</cffunction>
 	
-	<cffunction name="OnExecuteMainRequest" hint="create a context">
-		<cfif OnCreateContext(type="mainrequest", action=variables.pi.getMainAction(), parse=true)>
-			<cfif OnParseRequest()>
-				<cfif OnExecuteStackContext()>
-					<cfif OnLayout()>
-						<cfreturn true>
-					</cfif>
-				</cfif>
-			</cfif>
-		</cfif>
-		<cfreturn false>
-	</cffunction>
-
 	<cffunction name="OnExecuteStackContext" hint="create a context">
 		<cfset OnAppendStack()>
 		<cfset OnExecuteContext()>
@@ -151,10 +138,7 @@
 	</cffunction>
 	
 	<cffunction name="OnParseSettings" hint="create a context">
-		<cfif NOT variables.pi.getProperty("nosettings")>
-			<cfreturn OnExecuteInclude(type="include", template=variables.pi.getSettingsFile())>
-		</cfif>
-		<cfreturn false>
+		<cfreturn OnExecuteInclude(type="include", template=variables.pi.getSettingsFile())>
 	</cffunction>
 	
 	<cffunction name="OnBoxPreAction" hint="returns number of errors in sink">

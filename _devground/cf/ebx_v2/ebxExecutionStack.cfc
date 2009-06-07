@@ -7,7 +7,7 @@
 	<cfset variables.current      = "">
 	
 	<cffunction name="init">
-		<cfargument name="emptyContext" type="ebxExecutionContext" hint="context to add">
+		<cfargument name="emptyContext" type="any" hint="context to add">
 			<cfset variables.emptyContext = arguments.emptyContext>
 			<cfset setEmptyContext()>
 			<cfset setCurrent(getEmptyContext())>
@@ -15,7 +15,7 @@
 	</cffunction>
 	
 	<cffunction name="add" returntype="boolean" hint="adds context to stack return true on succeed">
-		<cfargument name="context" type="ebxExecutionContext" hint="context to add">
+		<cfargument name="context" type="any" hint="context to add">
 		<cfif maxReached()>
 			<cfreturn false>
 		</cfif>
@@ -25,7 +25,7 @@
 		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="get" returntype="ebxExecutionContext">
+	<cffunction name="get" returntype="any">
 		<cfargument name="index" type="numeric" required="false" default="0">
 		
 		<cfif arguments.index eq 0>
@@ -50,7 +50,7 @@
 		<cfreturn ArrayLen(getStack())>
 	</cffunction>
 	
-	<cffunction name="getExecuted">
+	<cffunction name="getExecutedStack">
 		<cfreturn variables.executed>
 	</cffunction>
 	
@@ -92,7 +92,7 @@
 	</cffunction>
 	
 	<cffunction name="setCurrent">
-		<cfargument name="context" type="ebxExecutionContext" hint="context to 'archive'">
+		<cfargument name="context" type="any" hint="context to 'archive'">
 		<cfset variables.current = arguments.context>
 		<cfreturn this>
 	</cffunction>
