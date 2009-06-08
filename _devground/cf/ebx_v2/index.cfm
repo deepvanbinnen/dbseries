@@ -12,7 +12,7 @@
 <cfoutput>#sf.freeTheSource(pageOutput)#</cfoutput>
 <cfoutput><p style="clear: both;">Code executed in: #getTickCount()-start_exec#ms</p></cfoutput>
 
-<cfdump var="#request.ebx.getEbx()#">
+<!--- <cfdump var="#request.ebx.getEbx()#"> --->
 
 <!--- 
 STACK DEBUGGING

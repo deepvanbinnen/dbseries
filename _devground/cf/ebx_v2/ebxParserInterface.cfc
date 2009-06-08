@@ -71,7 +71,7 @@
 		<cfreturn variables.thisContext>
 	</cffunction>
 	
-	<cffunction name="parseContext">
+<!--- 	<cffunction name="parseContext">
 		<cfargument name="action"     required="true"  type="string">
 		<cfargument name="template"   required="true"  type="string">
 		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#">
@@ -84,19 +84,30 @@
 				<cfdump var="#cfcatch#"><cfabort>
 			</cfcatch>
 		</cftry>
-	</cffunction>
+	</cffunction> --->
 	
 	<cffunction name="createContext">
 		<cfargument name="type"     required="true"  type="string">
 		<cfargument name="action"     required="true"  type="string">
 		<cfargument name="template"   required="true"  type="string">
-		<cfargument name="circuitdir" required="false" type="string" default="">
+		<!--- <cfargument name="circuitdir" required="false" type="string" default=""> --->
 		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#">
 		<cfargument name="contentvar" required="false" type="string"  default="">
 		<cfargument name="append"     required="false" type="boolean" default="false">
 		
-		<cfset variables.cf.createContext(argumentCollection=arguments)>
-		<cfreturn setContextFromFactory(arguments.type)>
+		<cfset var local = StructNew()>
+		<cfset local.req = getParsedAction(arguments.action)>
+		<cfif NOT StructIsEmpty(local.req)>
+			<cfset StructDelete(arguments, "action")>
+			<cfset StructAppend(local.req, arguments)>
+			<cfset variables.cf.createContext(argumentCollection=local.req)>
+			<cfset setContextFromFactory(arguments.type)>
+			<cfset addContextToStack()>
+			<cfset updateParserFromContext()>
+			<cfset setAttributesFromContext()>
+			<cfreturn true>
+		</cfif>
+		<cfreturn false>
 	</cffunction>
 	
 	<cffunction name="getParsedAction">

@@ -108,12 +108,7 @@
 		
 		<cfset var local = StructNew()>
 		<cfif NOT variables.pi.maxRequestsReached()>
-			<cfset local.req = variables.pi.getParsedAction(arguments.action)>
-			<cfif NOT StructIsEmpty(local.req)>
-				<cfset StructDelete(arguments, "action")>
-				<cfset StructAppend(local.req, arguments)>
-				<cfset variables.pi.createContext(argumentCollection=local.req)>
-				<cfset preContext()>
+			<cfif getContext(argumentCollection=arguments)>
 				<cfset executeContext()>
 				<cfset postContext()>
 				<cfreturn true>
@@ -150,51 +145,49 @@
 	
 	<cffunction name="executeMain">
 		<cfset var local = StructNew()>
-		<cfset local.req = variables.pi.getParsedAction(variables.pi.getMainAction())>
-		<cfif NOT StructIsEmpty(local.req)>
-			<cfset local.req.template = getParameter("switchfile")>
-			<cfset local.req.type     = "mainrequest">
-			<cfset variables.pi.createContext(argumentCollection=local.req)>
+		<cfset local.req.action   = variables.pi.getMainAction()>
+		<cfset local.req.template = getParameter("switchfile")>
+		<cfset local.req.type     = "mainrequest">
+		
+		<cfif getContext(argumentCollection=local.req)>
 			<cfset variables.pi.updateParserFromContext("original")>
-			<cfset preContext()>
 			<cfset executeContext()>
 			<cfset postPlugins()>
 			<cfset postContext()>
-			
 			<cfreturn true>
 		</cfif>
 		<cfreturn false>
 	</cffunction>
 	
-	
 	<cffunction name="executeLayout">
 		<cfset var local = StructNew()>
-		<cfset local.req = variables.pi.getParsedAction("internal.pathto.layout")>
-		<cfif NOT StructIsEmpty(local.req)>
-			<cfset local.req.template = getProperty("layoutfile")>
-			<cfset local.req.type     = "layout">
-			<cfset variables.pi.createContext(argumentCollection=local.req)>
-			<cfreturn do(argumentCollection=local.req)>
-		</cfif>
-		<cfreturn false>
+		<cfset local.req.action   = "internal.pathto.layout">
+		<cfset local.req.template = getProperty("layoutfile")>
+		<cfset local.req.type     = "layout">
+		<cfreturn do(argumentCollection=local.req)>
 	</cffunction>
 	
 	<cffunction name="executePlugin">
 		<cfargument name="template"   required="true" type="string">
 		<cfset var local = StructNew()>
-		<cfset local.req = variables.pi.getParsedAction("internal.pathto.plugins")>
-		<cfif NOT StructIsEmpty(local.req)>
-			<cfset local.req.template = arguments.template>
-			<cfset local.req.type     = "plugin">
-			<cfset variables.pi.createContext(argumentCollection=local.req)>
-				<cfset preContext()>
-				<cfset executeContext()>
-				<cfset postContext()>
-			<cfreturn true>
-			<!--- <cfreturn do(argumentCollection=local.req)> --->
-		</cfif>
-		<cfreturn false>
+		<cfset local.req.action   = "internal.pathto.plugins">
+		<cfset local.req.template = arguments.template>
+		<cfset local.req.type     = "plugin">
+		
+		<cfreturn do(argumentCollection=local.req)>
 	</cffunction>
+	
+	<cffunction name="getContext">
+		<cfargument name="type"       required="true" type="string">
+		<cfargument name="template"   required="true" type="string">
+		<cfargument name="action"     required="true" type="string">
+		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
+		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
+		<cfargument name="append"     required="false" type="boolean" default="false" hint="wheater to append contentvars output">
+		
+		<cfreturn variables.pi.createContext(argumentCollection=arguments)>
+	</cffunction>
+	
 	
 	
 	<cffunction name="preContext">
@@ -236,24 +229,20 @@
 	
 	<cffunction name="parseSettings">
 		<cfset var local = StructNew()>
-		<cfset local.req = variables.pi.getParsedAction("internal.pathto.settings")>
-		<cfif NOT StructIsEmpty(local.req)>
-			<cfset local.req.type     = "include">
-			<cfset local.req.template = getParameter("settingsfile")>
-			<cfreturn do(argumentCollection=local.req)>
-		</cfif>
-		<cfreturn false>
+		<cfset local.req.action   = "internal.pathto.settings">
+		<cfset local.req.template = getParameter("settingsfile")>
+		<cfset local.req.type     = "include">
+		
+		<cfreturn do(argumentCollection=local.req)>
 	</cffunction>
 	
 	<cffunction name="parseLayouts">
 		<cfset var local = StructNew()>
-		<cfset local.req = variables.pi.getParsedAction("internal.pathto.layouts")>
-		<cfif NOT StructIsEmpty(local.req)>
-			<cfset local.req.type     = "include">
-			<cfset local.req.template = getParameter("layoutsfile")>
-			<cfreturn do(argumentCollection=local.req)>
-		</cfif>
-		<cfreturn false>
+		<cfset local.req.action   = "internal.pathto.layouts">
+		<cfset local.req.template = getParameter("layoutsfile")>
+		<cfset local.req.type     = "include">
+		
+		<cfreturn do(argumentCollection=local.req)>
 	</cffunction>
 	
 	
