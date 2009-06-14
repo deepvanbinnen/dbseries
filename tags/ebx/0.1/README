@@ -1,3 +1,19 @@
+COPYRIGHT AND LICENCE
+----------------------------------------------------------------
+Copyright 2009 Bharat Deepak Bhikharie
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+   
 WHAT IT IS
 ----------------------------------------------------------------
 e-Box is a request parser highly inspired by the Fusebox framework (http://www.fusebox.org) and originated from finding a way to use fusebox methodology in a non-fusebox environment.  
@@ -10,10 +26,6 @@ The box has similar behaviour of Fusebox5 features "do" and "include", which mea
 A postplugin array can be filled during request with custom files to include after execution of the mainrequest.
 
 The form- and url scopes are converted to attributes on initialisation of the request, but this behaviour can be overridden.
-
-COPYRIGHT AND LICENCE
-----------------------------------------------------------------
-See LICENSE file that came with the source. 
 
 AUTHOR
 ----------------------------------------------------------------
@@ -34,7 +46,7 @@ Look at the demos source for examples.
 
 CHANGELOG
 ----------------------------------------------------------------
-Version 2.0  Jun 14, 2009
+Version 0.1  Jun 14, 2009
  * Setup project on googlecode (http://code.google.com/p/dbseries/source/browse/trunk/ebx) 
  * Rewrote my original ebx_core.cfm and made it component based
  * Provided hints for all methods and arguments
