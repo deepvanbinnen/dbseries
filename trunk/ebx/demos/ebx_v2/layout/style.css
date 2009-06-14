@@ -1,0 +1,42 @@
+html, body {height: 100%;}	
+body {
+	font-size: 62.5%;
+	font-family: Verdana;
+	margin: 0; padding: 0;
+	background-color: #FCF6CF;
+}
+
+#canvas  {
+	font-size: 1.2em;
+	line-height: 1.8em;
+	overflow: auto;
+}
+
+#main-nav {overflow: auto; border-bottom: 1px solid black; background:#8B4513; }
+#main-nav ul {margin-left: 19em; padding: 0; }
+#main-nav ul li {margin: 0 3em 0 0; padding: 0; float: left; list-style-type: none; color: white; font-weight: bold; font-size: 1.2em;}
+#main-nav ul li a {color: #CCCC00; text-decoration: none; line-height: 3em; }
+
+#sidebar {
+	float: left; 
+	width: 16em; min-height: 20em;
+	background: #8B7500;
+	padding: 0 0.5em 2em 1.5em; 
+}
+#sidebar a {color: #CCCC00; font-weight: bold;}
+#sidebar ul {padding-left: 1em;}
+#sidebar h3 {color: #451300; font-size: 1.4em; }
+
+#page-content {
+	margin-left: 18em;
+	padding: 1em;
+}
+
+#footer { clear: both; font-size: 0.9em; float: right; margin-right: 1em; border-top: 1px solid black; padding: 0 0 0 5em;}
+
+
+.small {font-size: 0.8em;}
+#download-button { border: 1px solid black; background: #8B4513; width: 90%;text-align: center; font-size: 1.25em; font-weight: bold; text-transform: uppercase;}
+#download-button a {line-height: 2.5em;  text-decoration: none; color: #CCCC00;}
+
+ 
