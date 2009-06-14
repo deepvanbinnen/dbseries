@@ -1,0 +1,16 @@
+#ebx project info
+
+= WHAT'S THIS =
+
+ebx is a request parser highly inspired by the Fusebox framework (http://www.fusebox.org) and originated from finding a way to use fusebox methodology in a non-fusebox environment.  
+
+= DETAILS =
+
+It's default behaviour is to extract a full-qualified action from known attributes, parse the action, look up the relative directory 
+from which to include the switchfile, include the switchfile and finally parse that output through a layoutfile.
+
+The box has similar behaviour of Fusebox5 features "do" and "include", which means you can customise attributes and store/assign output per action/include.
+
+A postplugin array can be filled during request with custom files to include after execution of the mainrequest.
+
+The form- and url scopes are converted to attributes on initialisation of the request, but this behaviour can be overridden.
