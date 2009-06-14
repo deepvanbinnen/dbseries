@@ -1,10 +1,10 @@
-#ebx project info
+# dbseries ebx project
 
 = WHAT'S THIS =
 
 ebx is a request parser highly inspired by the Fusebox framework (http://www.fusebox.org) and originated from finding a way to use fusebox methodology in a non-fusebox environment.  
 
-= DETAILS =
+== DETAILS ==
 
 It's default behaviour is to extract a full-qualified action from known attributes, parse the action, look up the relative directory 
 from which to include the switchfile, include the switchfile and finally parse that output through a layoutfile.
