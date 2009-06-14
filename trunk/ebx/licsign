@@ -1,0 +1,21 @@
+# licsign
+
+DT=`date`;
+AUTHOR="Bharat Deepak Bhikharie"
+WEB="http://code.google.com/p/dbseries/wiki/ebx";
+
+for f in `find . -regextype posix-egrep -iregex '.*\.(cfm|cfc)$'`;
+do
+   ff=`basename $f`;
+   cat licence.inc > $f.old;
+   echo "" >> $f.old;
+   echo "<!--- "  >> $f.old;
+   echo "Filename: $ff" >> $f.old;
+   echo "Date: $DT" >> $f.old;
+   echo "Author: $AUTHOR" >> $f.old;
+   echo "Project info: $WEB" >> $f.old;
+   echo "--->" >> $f.old;
+   echo  "" >> $f.old;
+   cat $f >> $f.old;
+   mv $f.old $f;
+done;
