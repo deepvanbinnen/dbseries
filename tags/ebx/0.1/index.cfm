@@ -1,0 +1,1 @@
+<cflocation url="demos/ebx_v2/index.cfm">
