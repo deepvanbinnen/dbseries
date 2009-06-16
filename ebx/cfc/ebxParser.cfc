@@ -56,14 +56,16 @@
 	<!--- EXECUTION METHODS --->
 	<cffunction name="do" returntype="boolean" hint="Include context-template and set the context-result. Return true on successfull execution">
 		<cfargument name="action"     required="true"  type="string" hint="the full qualified action">
-		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
 		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
 		<cfargument name="append"     required="false" type="boolean" default="false" hint="append contentvar value or overwrite">
+		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
 		<cfargument name="template"   required="false" type="string"  default="#getParameter('switchfile')#" hint="context template">
 		<cfargument name="type"       required="false" type="string"  default="request" hint="context type">
 		
 		<cfset var local = StructNew()>
 		<cfif NOT variables.pi.maxRequestsReached()>
+			<!--- convert named arguments to params --->
+			<cfset _setParamsFromArgs(arguments, "action,contentvar,append,template,type")>
 			<cfif getContext(argumentCollection=arguments)>
 				<cfset executeContext()>
 				<cfset postContext()>
@@ -75,15 +77,17 @@
 		<cfelse>
 			<!--- Throw max reached error --->
 		</cfif>
+		
 		<cfreturn false>
 	</cffunction>
 	
 	<cffunction name="include" returntype="boolean" hint="Create include-context and execute do. Return true on successfull execution">
 		<cfargument name="template"   required="true" type="string" hint="context template">
-		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
 		<cfargument name="contentvar" required="false" type="string"  default="" hint="variable that catches output">
 		<cfargument name="append"     required="false" type="boolean" default="false" hint="append contentvar value or overwrite">
+		<cfargument name="params"     required="false" type="struct"  default="#StructNew()#" hint="local params">
 		
+		<cfset _setParamsFromArgs(arguments, "contentvar,append,template")>
 		<cfset arguments.action = "internal.circuit.include">
 		<cfset arguments.type   = "include">
 		<!--- <cfreturn testRequest(argumentCollection=arguments)> --->
@@ -209,8 +213,13 @@
 		<cfreturn do(argumentCollection=local.req)>
 	</cffunction>
 	
-	
 	<!--- GETTERS / SETTERS --->
+	<cffunction name="getVar" returntype="any" hint="get variable value from pagecontext">
+		<cfargument name="name"  type="string" required="true" hint="variable name">
+		<cfargument name="value" type="any"    required="false" default="" hint="default value to return if variable does not exist">
+		<cfreturn variables.pi.ebx_get(arguments.name, arguments.value)>
+	</cffunction>
+	
 	<cffunction name="getEbx" returntype="ebx" hint="return composite ebx instance">
 		<cfreturn variables.ebx>
 	</cffunction>
@@ -288,5 +297,26 @@
 	</cffunction>
 	 --->
 	
+	<cffunction name="_setParamsFromArgs" returntype="ebxParser" hint="extract named arguments and set params from a call to 'do'">
+		<cfargument name="argcollection" type="struct" required="true" hint="original argumentcollection">
+		<cfargument name="excludekeys"   type="string" required="true" hint="keys to exclude">
 
+		<cfset var local  = StructNew()>
+		
+		<cfif NOT StructKeyExists(arguments.argcollection, "params")>
+			<cfset arguments.argcollection.params = StructNew()>
+		</cfif>
+		
+		<cfloop collection="#arguments.argcollection#" item="local.key">
+			<cfif local.key neq "params" AND NOT ListFindNoCase(arguments.excludekeys, local.key)>
+				<!--- Insert named argument to parameter --->
+				<cfset StructInsert(arguments.argcollection.params, local.key, arguments.argcollection[local.key])>
+				<cfset StructDelete(arguments.argcollection, local.key)>
+			</cfif>
+		</cfloop>
+		
+		<cfreturn this>
+	</cffunction>
+	
+	
 </cfcomponent>

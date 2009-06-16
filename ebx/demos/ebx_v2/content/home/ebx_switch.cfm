@@ -57,8 +57,8 @@
 	</cfcase>
 	
 	<cfdefaultcase>
-		<cfset request.ebx.do(action="home.loginbox", contentvar="content.sidebar", append="true")>
-		<cfset request.ebx.do(action="home.downloadbutton", contentvar="content.sidebar", append="true")>
+		<cfset request.ebx.do(action="loginbox", contentvar="content.sidebar", append="true")>
+		<cfset request.ebx.do(action="downloadbutton", contentvar="content.sidebar", append="true")>
 		<cfset request.ebx.include("dsp_home.cfm")>
 	</cfdefaultcase>
 </cfswitch>

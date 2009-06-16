@@ -48,7 +48,7 @@
 		<cfreturn true>
 	</cffunction>
 	
-	<cffunction name="getVar" returntype="any">
+	<cffunction name="getVar" returntype="any" hint="get variable value from pagecontext">
 		<cfargument name="name"  type="string" required="true" hint="variable name">
 		<cfargument name="value" type="any"    required="false" default="" hint="default value to return if variable does not exist">
 		<cfreturn getEbxPageContext().ebx_get(arguments.name, arguments.value)>
