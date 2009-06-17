@@ -1,0 +1,1 @@
+<cfoutput>#request.ebx.layout#</cfoutput>
