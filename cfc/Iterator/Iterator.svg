@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by diasvg.py -->
+<svg width="49.260cm" height="42.900cm" viewBox="2.300 -15.500 51.560 27.400"
+ xmlns="http://www.w3.org/2000/svg"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+<rect x="17.850" y="-15.450" width="8.338" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="17.850" y="-15.450" width="8.338" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="22.019" y="-14.450"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+AbstractDBIterator</text>
+<rect x="17.850" y="-14.050" width="8.338" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="17.850" y="-14.050" width="8.338" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="17.850" y="-13.650" width="8.338" height="15.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="17.850" y="-13.650" width="8.338" height="15.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="18.000" y="-13.008"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getCollection()</text>
+<text x="18.000" y="-12.208"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getLength()</text>
+<text x="18.000" y="-11.408"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getKey()</text>
+<text x="18.000" y="-10.607"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getCurrent()</text>
+<text x="18.000" y="-9.807"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getIndex()</text>
+<text x="18.000" y="-9.007"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++hasNext()</text>
+<text x="18.000" y="-8.207"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++whileHasNext()</text>
+<text x="18.000" y="-7.407"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++next()</text>
+<text x="18.000" y="-6.607"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setNext()</text>
+<text x="18.000" y="-5.807"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setKey()</text>
+<text x="18.000" y="-5.007"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setCurrent()</text>
+<text x="18.000" y="-4.207"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setIndex()</text>
+<text x="18.000" y="-3.407"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setLength()</text>
+<text x="18.000" y="-2.607"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setCollection()</text>
+<text x="18.000" y="-1.807"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++reset()</text>
+<text x="18.000" y="-1.007"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getIterable()</text>
+<text x="18.000" y="-0.207"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setIterable()</text>
+<text x="18.000" y="0.593"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++init()</text>
+<text x="18.000" y="1.393"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++hasValues()</text>
+<rect x="6.350" y="5.450" width="11.008" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="6.350" y="5.450" width="11.008" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="11.854" y="6.450"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+AbstractDBNativeIterator</text>
+<rect x="6.350" y="6.850" width="11.008" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="6.350" y="6.850" width="11.008" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="6.350" y="7.250" width="11.008" height="2.600" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="6.350" y="7.250" width="11.008" height="2.600" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="6.500" y="7.893"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++init()</text>
+<text x="6.500" y="8.693"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++hasNext()</text>
+<text x="6.500" y="9.493"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setNext()</text>
+<rect x="2.350" y="13.850" width="7.065" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="2.350" y="13.850" width="7.065" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="5.883" y="14.850"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+DBArrayIterator</text>
+<rect x="2.350" y="15.250" width="7.065" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="2.350" y="15.250" width="7.065" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="2.350" y="15.650" width="7.065" height="2.600" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="2.350" y="15.650" width="7.065" height="2.600" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="2.500" y="16.293"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++reset()</text>
+<text x="2.500" y="17.093"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++init()</text>
+<text x="2.500" y="17.893"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setNext()</text>
+<rect x="14.200" y="13.850" width="7.368" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="14.200" y="13.850" width="7.368" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="17.884" y="14.850"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+DBStructIterator</text>
+<rect x="14.200" y="15.250" width="7.368" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="14.200" y="15.250" width="7.368" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="14.200" y="15.650" width="7.368" height="2.600" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="14.200" y="15.650" width="7.368" height="2.600" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="14.350" y="16.293"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++init()</text>
+<text x="14.350" y="17.093"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++reset()</text>
+<text x="14.350" y="17.893"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setNext()</text>
+<rect x="24.900" y="13.750" width="7.360" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="24.900" y="13.750" width="7.360" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="28.580" y="14.750"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+DBStringIterator</text>
+<rect x="24.900" y="15.150" width="7.360" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="24.900" y="15.150" width="7.360" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="24.900" y="15.550" width="7.360" height="1.800" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="24.900" y="15.550" width="7.360" height="1.800" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="25.050" y="16.192"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++init()</text>
+<text x="25.050" y="16.992"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setNext()</text>
+<rect x="35.295" y="13.715" width="7.305" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="35.295" y="13.715" width="7.305" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="38.947" y="14.715"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+DBQueryIterator</text>
+<rect x="35.295" y="15.115" width="7.305" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="35.295" y="15.115" width="7.305" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="35.295" y="15.515" width="7.305" height="2.600" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="35.295" y="15.515" width="7.305" height="2.600" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="35.445" y="16.157"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++init()</text>
+<text x="35.445" y="16.957"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setNext()</text>
+<text x="35.445" y="17.758"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++row2struct()</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="11.854,10.812 11.854,11.850 5.883,11.850 5.883,13.800 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="12.254,10.812 11.854,10.012 11.454,10.812 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="12.254,10.812 11.854,10.012 11.454,10.812 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="22.019,2.712 22.019,3.600 11.854,3.600 11.854,5.400 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="22.419,2.712 22.019,1.912 21.619,2.712 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="22.419,2.712 22.019,1.912 21.619,2.712 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="11.854,10.812 11.854,11.850 17.884,11.850 17.884,13.800 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="12.254,10.812 11.854,10.012 11.454,10.812 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="12.254,10.812 11.854,10.012 11.454,10.812 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="22.019,2.711 22.019,8.412 28.580,8.412 28.580,13.701 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="22.419,2.711 22.019,1.911 21.619,2.711 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="22.419,2.711 22.019,1.911 21.619,2.711 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="22.019,2.712 22.019,8.437 38.947,8.437 38.947,13.665 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="22.419,2.712 22.019,1.912 21.619,2.712 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="22.419,2.712 22.019,1.912 21.619,2.712 "/>
+<rect x="5.400" y="22.150" width="6.332" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="5.400" y="22.150" width="6.332" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="8.566" y="23.150"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+DBListIterator</text>
+<rect x="5.400" y="23.550" width="6.332" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="5.400" y="23.550" width="6.332" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="5.400" y="23.950" width="6.332" height="3.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="5.400" y="23.950" width="6.332" height="3.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="5.550" y="24.593"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++reset()</text>
+<text x="5.550" y="25.393"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getList()</text>
+<text x="5.550" y="26.193"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++getDelimiter()</text>
+<text x="5.550" y="26.993"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++setDelimiter()</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100" stroke-dasharray="0.40,0.40" points="8.566,22.100 8.566,20.200 5.883,20.200 5.883,18.636 "/>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="6.133,19.268 5.883,18.468 5.633,19.268 "/>
+<rect x="45.045" y="13.840" width="6.465" height="1.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="45.045" y="13.840" width="6.465" height="1.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="48.278" y="14.840"  fill="#000000" text-anchor="middle" font-size="1.00" font-family="sans" font-style="normal" font-weight="700">
+DBNullIterator</text>
+<rect x="45.045" y="15.240" width="6.465" height="0.400" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="45.045" y="15.240" width="6.465" height="0.400" fill="none" stroke="#000000" stroke-width="0.100" />
+<rect x="45.045" y="15.640" width="6.465" height="1.000" fill="#FFFFFF" stroke="none" stroke-width="0"/>
+<rect x="45.045" y="15.640" width="6.465" height="1.000" fill="none" stroke="#000000" stroke-width="0.100" />
+<text x="45.195" y="16.282"  fill="#000000" text-anchor="start" font-size="0.80" font-family="monospace" font-style="normal" font-weight="400">
++init()</text>
+<polyline fill="none" stroke="#000000" stroke-width="0.100"  points="22.019,2.712 22.019,8.437 48.278,8.437 48.278,13.790 "/>
+<polygon fill="#FFFFFF" stroke="none" stroke-width="0.100" points="22.419,2.712 22.019,1.912 21.619,2.712 "/>
+<polygon fill="none" stroke="#000000" stroke-width="0.100"  points="22.419,2.712 22.019,1.912 21.619,2.712 "/>
+</svg>
