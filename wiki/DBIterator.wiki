@@ -9,4 +9,4 @@ A general iterator object
 
 Create iterators based on datatype
 
-DBIterator.png
+http://code.google.com/p/dbseries/wiki/DBIterator.png
