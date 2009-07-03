@@ -1,0 +1,10 @@
+#summary One-sentence summary of this page.
+
+= DBIterator =
+
+A general iterator object
+
+
+= Details =
+
+Create iterators based on datatype
