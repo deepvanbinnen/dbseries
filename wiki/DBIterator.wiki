@@ -8,3 +8,5 @@ A general iterator object
 = Details =
 
 Create iterators based on datatype
+
+DBIterator.png
