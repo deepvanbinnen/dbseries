@@ -2,7 +2,7 @@
 <cfsavecontent variable="pageOutput">
 	<cfset sf = createObject("component", "cfc.sourceformat").init()>
 	
-	<cfset request.ebx = createObject("component", "ebx").init(appPath="", defaultact="home.tonen")>
+	<cfset request.ebx = createObject("component", "dbseries.trunk.ebx.cfc.ebx").init(appPath="/dbseries/_devground/cf/ebx_v2/", defaultact="home.tonen")>
 	<cfset request.ebx.setup()>
 	
 	<cfset request.ebx = request.ebx.getParser()>
