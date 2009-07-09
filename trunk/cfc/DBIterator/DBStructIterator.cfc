@@ -18,6 +18,13 @@
 		<cfreturn false>
 	</cffunction>
 	
+	<cffunction name="getValue">
+		<cfargument name="dataKey" type="string" required="false" default="">
+		<cfset var local = StructNew()>
+		<cfset local.data = getCurrent()>
+		<cfreturn local.data[arguments.dataKey]>
+	</cffunction>
+	
 	<cffunction name="reset" returntype="any" hint="resets the iterator">
 		<cfset super.reset()>
 		<cfset setIterable(getCollection().entrySet().iterator())>

@@ -20,6 +20,10 @@
 		<cfreturn this>
 	</cffunction>
 	
+	<cffunction name="new">
+		<cfreturn createObject("component", "DBIterator")>
+	</cffunction>
+	
 	<cffunction name="_setIterator">
 		<cfargument name="iterator" type="any"  required="true" hint="the current iterator">
 		
@@ -151,6 +155,11 @@
 		<cfargument name="length" type="numeric" required="true">
 			<cfset this.length = arguments.length>
 		<cfreturn this>
+	</cffunction>
+	
+	<cffunction name="getValue">
+		<cfargument name="dataKey" type="string" required="false" default="">
+		<cfreturn variables.iterator.getValue(argumentCollection=arguments)>
 	</cffunction>
 	
 	<cffunction name="getIterable">

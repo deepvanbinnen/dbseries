@@ -64,6 +64,10 @@
 		<cfreturn this>
 	</cffunction>
 	
+	<cffunction name="getValue">
+		<cfreturn getCurrent()>
+	</cffunction>
+	
 	<cffunction name="getLength" returntype="numeric" hint="get the number of elements iterated">
 		<cfreturn variables.length>
 	</cffunction>

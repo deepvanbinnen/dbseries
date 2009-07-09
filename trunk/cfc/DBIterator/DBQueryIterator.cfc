@@ -22,6 +22,14 @@
 		<cfreturn false>
 	</cffunction>
 	
+	<cffunction name="getValue">
+		<cfargument name="dataKey" type="string" required="false" default="">
+		<cfset var local = StructNew()>
+		<cfset local.data = getCurrent()>
+		<cfreturn local.data[arguments.dataKey]>
+	</cffunction>
+	
+	
 	<cffunction name="row2struct" hint="there doesn't seem to be another way to get the current row in a struct form">
 		<cfargument name="query"  type="query" required="true">
 		<cfargument name="index"  type="numeric" required="true">
