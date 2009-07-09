@@ -16,7 +16,7 @@
 				<dt>#it2.key#</dt><dd>#it2.current#</dd>
 			</cfloop>
 		</dl>
-		<cfdump var="#it2.getCollection()#"></dd>
+	</dd>
 	<dt>Key</dt><dd>#it.key#</dd>
 	<dt>Index</dt><dd>#it.index#</dd>
 	<dt>Name</dt><dd>#it.current.name#</dd>
