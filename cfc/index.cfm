@@ -1,11 +1,7 @@
-<cfset myCFC = createObject("component", "DBForm")>
 <cfset ins = createObject("component", "Inspector")>
+<cfset myCFC = createObject("component", "DBForm")>
 
-<cfset e = StructNew()>
-<cfset e.element = "ass">
-<cfdump var="#ins._call(myCFC, "addRule", e)#">
-
-<cfdump var="#myCFC#">
+<cfdump var="#myCFC._dump()#">
 
 <cfset start = getTickCount()>
 <cfset myArr = ArrayNew(1)>
