@@ -1,0 +1,30 @@
+# a request parser highly inspired by the Fusebox framework (http://www.fusebox.org)
+
+## LATEST ##
+
+Almost a year ago since I last updated sources, but I've been busy as a bee forging crafting and so on.
+Most of the ease-of-use features I wanted to implement are now actually in the box :)
+
+Besided do and include I have added two more methods to the parser called "each" and "obtain".
+The "each"-methods will loop over the given collection (list, array, query, xml) and pass the iterator object
+as an attribute to the called fuse and the "obtain"-method will return the output for the call
+rather than flushing it to a buffer. Needless to say using savecontent to fetch the output is now needless :)
+
+After the Scotch on The Rocks presentations by Ben Nadel and Ray Camden I have thoughts on creating
+a CFBuilder Extension for easy setups of ebox. Also you can find the SnipexExtension on dbseries soon.
+
+# WHAT'S THIS #
+
+ebx originated from finding a way to use fusebox methodology in a non-fusebox environment.
+
+It's default behaviour is to extract a full-qualified action from known attributes, parse the action, look up the relative directory
+from which to include the switchfile, include the switchfile and finally parse that output through a layoutfile.
+
+The box has similar behaviour of Fusebox5 features "do" and "include", which means you can customise attributes and store/assign output per action/include.
+
+A postplugin array can be filled during request with custom files to include after execution of the mainrequest.
+
+2010-05-31: This is not applicable anymore, I am heavily considering removing the plugin-idea since the
+
+The form- and url scopes are converted to attributes on initialisation of the request, but this behaviour can be overridden.
+
