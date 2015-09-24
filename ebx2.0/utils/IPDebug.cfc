@@ -1,11 +1,6 @@
 <cfcomponent name="IPDebug" hint="global tester for CGI.REMOTE_ADDR (meant for debugging); a single instance for this component should be added in the application/session scope">
 	<cfset this.ips = StructNew()>
-	<cfset this.ips["e-Vision"] = "193.172.88.205">
-	<cfset this.ips["e-Vision2"] = "193.172.88.223">
-	<cfset this.ips["deepak"]   = "83.85.101.59">
-	<cfset this.ips["mirthe"]   = "83.163.6.108">
-	<cfset this.ips["kees"]     = "213.84.17.8">
-	<cfset this.ips["edi"]      = "94.210.127.179">
+	<!--- <cfset this.ips["deep"] = "1.2.3.4"> --->
 	<cfset this.iplist = "">
 
 	<cfset variables.knownIPS = StructNew()>
